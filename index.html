@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TBPN Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #00ff88;
+            --secondary-green: #66ff99;
+            --bg-dark: #0a0a0a;
+            --bg-medium: #1a1a1a;
+            --bg-accent: #0f1a0f;
+            --glass-bg: rgba(0, 0, 0, 0.85);
+            --glow-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            --nav-width: 280px;
+            --right-abstract-min-width: 450px;
+        }
+        * {margin:0;padding:0;box-sizing:border-box;}
+        body {font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 50%, var(--bg-accent) 100%);background-attachment:fixed;color:var(--primary-green);line-height:1.6;min-height:100vh;overflow-x:hidden;display:flex;}
+        body::before {content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(0,255,136,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.03) 1px,transparent 1px);background-size:80px 80px;animation:gridMove 30s linear infinite;pointer-events:none;z-index:-1;}
+        @keyframes gridMove {0%{transform:translate(0,0);}100%{transform:translate(80px,80px);}}
+        .left-nav-column {width:var(--nav-width);flex-shrink:0;height:100vh;background:rgba(0,0,0,0.3);padding:20px;overflow-y:auto;border-right:1px solid rgba(0,255,136,0.2);position:fixed;top:0;left:0;z-index:1000;}
+        .nav-title {font-size:1.2rem;font-weight:500;margin-bottom:20px;text-align:center;color:var(--primary-green);text-shadow:var(--glow-shadow);}
+        .nav-list {list-style:none;}
+        .nav-item a, .nav-item span {display:block;padding:10px 15px;color:var(--secondary-green);text-decoration:none;border-radius:6px;margin-bottom:5px;transition:background 0.3s,color 0.3s;font-size:0.9rem;position:relative;}
+        .nav-item a:hover, .nav-item a.active {background:var(--primary-green);color:var(--bg-dark);text-shadow:none;}
+        .nav-item.sub-item a {padding-left:40px;font-size:0.85rem;opacity:0.8;}
+        .nav-item.sub-item::before {content:"↳ ";opacity:0.7;position:absolute;left:18px;top:50%;transform:translateY(-50%);pointer-events:none;}
+        .page-content-wrapper {flex-grow:1;display:flex;flex-direction:column;padding-left:var(--nav-width);min-height:100vh;}
+        .page-header {padding:30px 40px 20px 40px;text-align:center;flex-shrink:0;}
+        .page-header h1 {font-size:2.2rem;font-weight:400;text-shadow:var(--glow-shadow);margin-bottom:10px;}
+        .page-header p {font-size:0.9rem;color:var(--secondary-green);opacity:0.7;}
+        .columns-container {display:flex;flex-grow:1;overflow:hidden;}
+        .center-info-column {flex-grow:1;padding:20px;border-right:1px solid rgba(0,255,136,0.1);overflow-y:auto;display:flex;align-items:center;justify-content:center;color:rgba(0,255,136,0.3);font-size:1.1rem;min-width:350px;}
+        .right-abstract-column {width:45%;min-width:var(--right-abstract-min-width);max-width:600px;flex-shrink:0;padding:20px;padding-top:60px;overflow-y:auto;position:relative;}
+        .center-info-column::-webkit-scrollbar,
+        .right-abstract-column::-webkit-scrollbar,
+        .left-nav-column::-webkit-scrollbar {width:8px;}
+        .center-info-column::-webkit-scrollbar-track,
+        .right-abstract-column::-webkit-scrollbar-track,
+        .left-nav-column::-webkit-scrollbar-track {background:rgba(0,0,0,0.1);border-radius:10px;}
+        .center-info-column::-webkit-scrollbar-thumb,
+        .right-abstract-column::-webkit-scrollbar-thumb,
+        .left-nav-column::-webkit-scrollbar-thumb {background:var(--primary-green);border-radius:10px;}
+        .center-info-column::-webkit-scrollbar-thumb:hover,
+        .right-abstract-column::-webkit-scrollbar-thumb:hover,
+        .left-nav-column::-webkit-scrollbar-thumb:hover {background:var(--secondary-green);}
+        .top-right-controls {position:absolute;top:15px;right:20px;z-index:100;}
+        .collapse-all {background:rgba(0,255,136,0.1);border:1px solid var(--primary-green);color:var(--primary-green);padding:8px 12px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:0.75rem;transition:all 0.3s;backdrop-filter:blur(10px);}
+        .collapse-all:hover {background:rgba(0,255,136,0.2);box-shadow:var(--glow-shadow);}
+        .entity-card {background:var(--glass-bg);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(0,255,136,0.2);overflow:hidden;transition:all 0.5s;margin:0 auto 20px auto;max-width:100%;}
+        .entity-card:hover {border-color:var(--primary-green);box-shadow:0 0 40px rgba(0,255,136,0.2);}
+        .entity-photo-container {text-align:center;padding:30px;}
+        .entity-photo {width:150px;height:180px;border-radius:16px;object-fit:cover;border:2px solid rgba(0,255,136,0.3);transition:all 0.4s;box-shadow:0 0 20px rgba(0,0,0,0.5);}
+        .entity-photo:hover {transform:scale(1.03);border-color:var(--primary-green);box-shadow:0 0 30px rgba(0,255,136,0.3);}
+        .entity-name {font-size:1.6rem;font-weight:500;margin-top:15px;text-shadow:var(--glow-shadow);}
+        .synthesis-runner {background:rgba(0,255,136,0.05);border-top:1px solid rgba(0,255,136,0.2);border-bottom:1px solid rgba(0,255,136,0.2);height:50px;overflow:hidden;position:relative;cursor:pointer;transition:all 0.3s;}
+        .synthesis-runner:hover {height:auto;min-height:50px;background:rgba(0,255,136,0.08);}
+        .synthesis-text {position:absolute;white-space:nowrap;font-size:0.9rem;color:var(--secondary-green);top:50%;transform:translateY(-50%);animation:scrollText 20s linear infinite;padding:0 20px;}
+        .synthesis-runner.expanded-details .synthesis-text,.synthesis-runner:hover .synthesis-text{position:static;white-space:normal;animation:none;transform:none;padding:15px 20px;line-height:1.4;}
+        @keyframes scrollText {0%{transform:translate(100%,-50%);}100%{transform:translate(-100%,-50%);}}
+        .synthesis-runner:hover::after {content:"Click to expand full details ▼";position:absolute;bottom:5px;right:15px;font-size:0.7rem;color:var(--primary-green);opacity:0.7;}
+        .synthesis-runner.expanded-details::after {content:"Details Expanded ▼";}
+        .details-panel {max-height:0;overflow:hidden;transition:all 0.5s;background:rgba(0,0,0,0.3);}
+        .details-panel.expanded {max-height:2000px;padding:20px;}
+        .detail-section {margin:20px 0;background:rgba(0,255,136,0.02);border-radius:8px;border-left:3px solid var(--primary-green);overflow:hidden;transition:all 0.3s;}
+        .detail-header {padding:12px 15px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:rgba(0,255,136,0.05);}
+        .detail-header:hover {background:rgba(0,255,136,0.08);}
+        .detail-title {font-size:0.9rem;font-weight:500;display:flex;align-items:center;gap:8px;}
+        .detail-icon {font-size:1rem;}
+        .detail-collapse {font-size:0.8rem;color:var(--secondary-green);transition:transform 0.3s;}
+        .detail-section.collapsed .detail-collapse {transform:rotate(180deg);}
+        .detail-content {padding:15px;max-height:300px;overflow-y:auto;transition:all 0.3s;background:rgba(0,0,0,0.2);}
+        .detail-content::-webkit-scrollbar {width:6px;}
+        .detail-content::-webkit-scrollbar-thumb {background:var(--primary-green);border-radius:10px;}
+        .detail-section.collapsed .detail-content {max-height:0;padding:0 15px;}
+        .info-grid {display:grid;gap:10px;}
+        .info-item {display:grid;grid-template-columns:100px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid rgba(0,255,136,0.1);}
+        .info-item:last-child {border-bottom:none;}
+        .info-label {font-size:0.75rem;color:var(--secondary-green);text-transform:uppercase;letter-spacing:1px;opacity:0.8;}
+        .info-value {font-size:0.85rem;color:var(--primary-green);}
+        .info-value a {color:var(--primary-green);text-decoration:none;transition:all 0.3s;}
+        .info-value a:hover {text-shadow:var(--glow-shadow);}
+        .company-timeline {display:flex;flex-direction:column;gap:12px;}
+        .company-item {background:rgba(0,255,136,0.03);border-radius:8px;padding:12px;border-left:3px solid var(--secondary-green);transition:all 0.3s;}
+        .company-item:hover {background:rgba(0,255,136,0.06);border-left-color:var(--primary-green);}
+        .company-name {font-weight:600;color:var(--primary-green);margin-bottom:4px;}
+        .company-role {font-size:0.8rem;color:var(--secondary-green);margin-bottom:6px;}
+        .company-details {font-size:0.75rem;color:var(--secondary-green);opacity:0.8;line-height:1.4;}
+        .children-list {display:flex;flex-direction:column;gap:8px;}
+        .child-item {background:rgba(0,255,136,0.03);padding:10px 12px;border-radius:6px;border-left:3px solid var(--primary-green);}
+        .child-name {font-weight:500;color:var(--primary-green);}
+        .child-age {font-size:0.8rem;color:var(--secondary-green);margin-left:8px;}
+        .loading {text-align:center;padding:60px;color:var(--secondary-green);opacity:0.7;font-size:1.2rem;}
+        .empty-entity {text-align:center;padding:40px;color:var(--secondary-green);opacity:0.7;font-size:1rem;}
+        .empty-entity p {margin-top:10px;}
+        .empty-entity .icon {font-size:2.5rem;margin-bottom:10px;display:block;}
+        .fade-in {animation:fadeIn 0.6s;}
+        @keyframes fadeIn {from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}
+        }
+        /* Cards + Interviews for entity content */
+        .entity-cards-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-bottom: 36px;
+        }
+        .expandable-card {
+            background: rgba(0,255,136,0.10);
+            border: 1px solid #00ff88;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 0 12px 0 rgba(0,255,136,0.05);
+            transition: box-shadow 0.3s;
+        }
+        .expandable-card .card-header {
+            padding: 14px 24px;
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: #00ff88;
+            background: rgba(10,10,10,0.88);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .expandable-card .card-title {
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .expandable-card .card-toggle {
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+        .expandable-card .card-content {
+            padding: 18px 28px;
+            background: rgba(10,10,10,0.98);
+            border-top: 1px solid #66ff99;
+            display: none;
+            font-size: 1rem;
+        }
+        .expandable-card.open .card-content {
+            display: block;
+            animation: fadeInCard 0.4s;
+        }
+        .expandable-card.open .card-toggle {
+            transform: rotate(180deg);
+        }
+        @keyframes fadeInCard {from{opacity:0;}to{opacity:1;}}
+        .interviews-slider-box {
+            margin-top: 38px;
+            background: rgba(0,255,136,0.07);
+            border-radius: 14px;
+            padding: 20px 12px 8px 12px;
+            border: 1px solid #00ff88;
+        }
+        .interviews-slider-box h3 {
+            color: #66ff99;
+            font-size: 1.15rem;
+            margin-bottom: 14px;
+            margin-left: 8px;
+        }
+        .interview-slider {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding-bottom: 12px;
+        }
+        .interview-item {
+            background: rgba(10,10,10,0.97);
+            border-radius: 12px;
+            min-width: 350px;
+            max-width: 370px;
+            box-shadow: 0 0 7px 0 rgba(0,255,136,0.04);
+            border: 1px solid #66ff99;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+        }
+        .interview-title {font-size:1rem;font-weight:600;margin-bottom:8px;}
+        .interview-video {margin-bottom:10px;}
+        .interview-meta {font-size:0.90rem; color: #66ff99;}
+        @media (max-width:1024px){.center-info-column{flex-grow:0.5;}.right-abstract-column{width:55%;min-width:380px;}}
+        @media (max-width:768px){body{flex-direction:column;}.left-nav-column{width:100%;height:auto;position:static;border-right:none;border-bottom:1px solid rgba(0,255,136,0.2);z-index:auto;}.nav-item.sub-item::before{left:15px;}.page-content-wrapper{padding-left:0;}.columns-container{flex-direction:column;}.center-info-column,.right-abstract-column{width:100%;min-width:unset;border-right:none;max-width:100%;}.right-abstract-column{padding-top:60px;}.top-right-controls{}.entity-photo{width:120px;height:150px;}.info-item{grid-template-columns:1fr;gap:5px;}}
+    </style>
+</head>
+<body>
+    <nav class="left-nav-column">
+        <div class="nav-title">Entities</div>
+        <ul class="nav-list">
+            <li class="nav-item"><a href="#" data-entity="john-coogan">John Coogan</a></li>
+            <li class="nav-item sub-item"><a href="#" data-entity="lucy">Lucy (Assoc.)</a></li>
+            <li class="nav-item sub-item"><a href="#" data-entity="soylent">Soylent (Co-founder)</a></li>
+            <li class="nav-item sub-item"><a href="#" data-entity="plus-co">Plus (Co)</a></li>
+            <li class="nav-item"><a href="#" data-entity="jordi-hays" class="active">Jordi Hays</a></li>
+            <li class="nav-item sub-item"><a href="#" data-entity="likewise">Likewise</a></li>
+            <li class="nav-item sub-item"><a href="#" data-entity="branded-native">Branded Native</a></li>
+            <li class="nav-item sub-item"><a href="#" data-entity="party-round">Party Round</a></li>
+            <li class="nav-item"><a href="#" data-entity="tbpn">TBPN</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-content-wrapper">
+        <header class="page-header">
+            <h1>TBPN Report</h1>
+            <p>Search • Capture • Research • Synthesize</p>
+        </header>
+
+        <div class="columns-container">
+            <div class="center-info-column" id="centerInfoColumn">
+                <p>[ Central Info Area ]</p>
+            </div>
+            <div class="right-abstract-column">
+                <div class="top-right-controls">
+                    <button class="collapse-all" onclick="toggleAllDetailsView()">◐ MINIMAL MODE</button>
+                </div>
+                <div id="entityContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== ENTITIES COMPLETOS ==========
+        const entities = {
+            'john-coogan': {
+                name: 'John Coogan',
+                photo: 'https://pbs.twimg.com/profile_images/1788971699380506624/5GNro0k1_400x400.jpg',
+                synthesis: 'YouTuber (Tech for Luddites) • Co-founder of Soylent & Lucy Goods • Software Engineer • Focus on technology, startups, and futurism • Content creator explaining complex tech in simple terms.',
+                basicInfo: {
+                    'Occupation': 'YouTuber, Entrepreneur',
+                    'Known For': 'Soylent, Lucy Goods, Tech for Luddites YouTube Channel',
+                    'YouTube': '<a href="https://www.youtube.com/@JohnCooganPlus" target="_blank">Tech for Luddites</a>'
+                },
+                companies: [
+                    { name: 'Soylent', period: '2013—Active (Role Evolved)', role: 'Co-Founder', details: ['Pioneered complete meal replacements.'] },
+                    { name: 'Lucy Goods, Inc.', period: 'Co-founded', role: 'Co-Founder', details: ['Nicotine alternative products.'] },
+                    { name: 'Plus AI / Plus Docs', period: 'Recent Venture', role: 'Founder/CEO', details: ['AI-powered presentation and document tools. Raised seed funding.'] }
+                ]
+            },
+            'lucy': {
+                name: 'Lucy (Company)',
+                photo: 'https://pbs.twimg.com/profile_images/1366849797098803202/9WFzLd6N_400x400.jpg',
+                synthesis: 'Lucy Goods, Inc. is a company developing and selling nicotine alternative products, such as gums and pouches. Co-founded by John Coogan. Aims to provide cleaner nicotine delivery systems.',
+                basicInfo: { 'Product': 'Nicotine Alternatives', 'Co-Founder': 'John Coogan', 'Status': 'Active', 'Website': '<a href="https://lucy.co" target="_blank">lucy.co</a>' }
+            },
+            'soylent': {
+                name: 'Soylent',
+                photo: 'https://cdn.shopify.com/s/files/1/0004/6279/7481/files/SOY_Logomark_75x75_RGB_GREEN_300DPI_100x.png',
+                synthesis: 'Meal replacement company • Co-founded by Rob Rhinehart, Matt Cauble, John Coogan, and David Renteln • Aims to provide complete, affordable nutrition • Multiple product lines including powders and ready-to-drink shakes.',
+                basicInfo: { 'Industry': 'Food Technology', 'Founded': '2013', 'Key People': 'Rob Rhinehart, John Coogan, et al.', 'Website': '<a href="https://soylent.com" target="_blank">soylent.com</a>' }
+            },
+            'plus-co': {
+                name: 'Plus AI / Plus Docs (John Coogan Co.)',
+                photo: 'https://assets-global.website-files.com/6205aa29a45962b3c1atom/6205aa29a459624a0dat_logo_black.svg',
+                synthesis: 'Plus is an AI-powered tool for creating and editing presentations and documents, integrated with Google Slides and other platforms. Founded by John Coogan. Aims to streamline content creation using AI.',
+                basicInfo: {'Industry': 'AI, Software, Productivity Tools', 'Founder': 'John Coogan', 'Status': 'Active, Seed Funded', 'Website': '<a href="https://www.plusdocs.com/" target="_blank">plusdocs.com</a> / <a href="https://www.plus AI/" target="_blank">plus.ai</a>'}
+            },
+            'jordi-hays': {
+                name: 'Jordi Hays',
+                photo: 'https://framerusercontent.com/images/VhgK5Xdz2cGX0nLwIEgj2A1vt9E.jpg',
+                synthesis: 'TBPN Host • Serial Entrepreneur • 3 Companies Founded • 2 Exits • Father of 2 • UCSB Graduate • Currently Building Media Empire • Former CEO Branded Native • Party Round Co-founder • $7M+ Raised • Based California • Married Sarah Chase • Tech Innovator • Content Creator',
+                basicInfo: {
+                    'Location': '[Ciudad ?], California',
+                    'Height': '5\'8"', 'Role': 'TBPN Host',
+                    'Partner': '<a href="https://x.com/sarahchase?lang=en" target="_blank">Sarah Chase</a>',
+                    'Children': '2', 'Website': '<a href="https://www.jordihays.com/story" target="_blank">jordihays.com</a>',
+                    'Known For': 'Branded Native | Party Round | TBPN'
+                },
+                parents: {
+                    'Mother': '<a href="https://open.spotify.com/episode/5Hu3VMhaVsURETWMZiJG68?trackId=5t6GyhawtK5itjpDdvGGx0" target="_blank">Freelance Designer</a> & Non-Profit Worker',
+                    'Father': '<a href="https://youtu.be/rx9cagzRHns?list=PLBV_0ax_G8bowGFK97Nrv0DBmxaDObKgA&t=4382" target="_blank">High School Teacher</a>'
+                },
+                education: {
+                    'University': '<a href="https://en.wikipedia.org/wiki/University_of_California,_Santa_Barbara" target="_blank">University of California, Santa Barbara (UCSB)</a>',
+                    'Period': '2014 - 2018'
+                },
+                children: [
+                    { name: 'Ruby', age: '<a href="https://www.instagram.com/p/DCuQjVIySRv/?hl=en&img_index=1" target="_blank">9 months</a>' },
+                    { name: 'Roman', age: '<a href="https://www.instagram.com/p/C31Q2mZpK-9/?hl=en&img_index=1" target="_blank">3 years old</a>' }
+                ],
+                companies: [
+                    { name: 'Branded Native', period: '2016—2023', role: 'Founder & CEO', details: ['Capital Raised: <a href="https://youtu.be/G_TH9XezTMk?t=881" target="_blank">$50K</a> but bought out investors', 'Successor: <a href="https://www.linkedin.com/in/mariatavierne/" target="_blank">Maria Tavierne</a> – CEO since <a href="https://www.linkedin.com/posts/randalltavierne_i-am-so-proud-to-congratulate-my-daughter-activity-7060226621084954626-x2IB/" target="_blank">May 2023</a>'] },
+                    { name: 'Likewise', period: '2019—2021', role: 'Co-Founder', details: ['<a href="https://www.antler.co/blog/jordi-hays-and-matt-jung-co-founders-of-antler-us" target="_blank">Raised</a> $350K pre-seed from <a href="https://www.antler.co" target="_blank">Antler</a>', 'Acquired by <a href="http://brand.co" target="_blank">brand.co</a> in 2022 for undisclosed amount'] },
+                    { name: 'Party Round', period: '2021—2024', role: 'Co-Founder & CEO', details: ['Raised <a href="https://techcrunch.com/2021/11/18/party-round-raises-7m-to-make-the-process-of-raising-capital-less-awful/" target="_blank">$7M</a>', 'Acquired by Rho for undisclosed amount'] },
+                    { name: 'TBPN', period: 'Oct 2024—Present', role: 'Host', details: ['Primary media venture.'] }
+                ]
+            },
+            'likewise': {
+                name: 'Likewise (Jordi Hays Co.)',
+                photo: '',
+                synthesis: 'Company co-founded by Jordi Hays. Focused on [Specify product/service if known, e.g., social recommendations]. Received $350K pre-seed funding from Antler. Acquired by brand.co in 2022.',
+                basicInfo: {'Co-Founder': 'Jordi Hays', 'Status': 'Acquired by brand.co (2022)', 'Funding': '$350K Pre-seed (Antler)'}
+            },
+            'branded-native': {
+                name: 'Branded Native (Jordi Hays Co.)',
+                photo: '',
+                synthesis: 'Influencer marketing and native advertising agency founded by Jordi Hays, who served as CEO. Maria Tavierne took over as CEO in May 2023. Initial capital of $50K with investors later bought out.',
+                basicInfo: {'Founder': 'Jordi Hays', 'Status': 'Active (New Leadership)', 'Funding': '$50K (Investors bought out)', 'Industry': 'Influencer Marketing, Native Advertising'}
+            },
+            'party-round': {
+                name: 'Party Round (Jordi Hays Co.)',
+                photo: 'https://ph-files.imgix.net/d51f8523-70a2-405a-b792-6892eadb0fce.png?auto=format&fit=crop',
+                synthesis: 'Fintech platform co-founded by Jordi Hays (CEO). Raised $7M to simplify startup fundraising processes, offering tools for cap table management and investment rounds. Acquired by Rho.',
+                basicInfo: {'Co-Founder & CEO': 'Jordi Hays', 'Status': 'Acquired by Rho', 'Funding': '$7M', 'Industry': 'Fintech, Startup Fundraising'}
+            },
+            'tbpn': {
+                name: 'TBPN (The Based Podcast Network)',
+                photo: '',
+                synthesis: 'The Based Podcast Network (TBPN) is a media venture hosted and led by Jordi Hays, launched around October 2024. This is Jordi\'s current primary focus, aiming to build a significant media presence and content network.',
+                basicInfo: { 'Host/Leader': 'Jordi Hays', 'Launch': 'October 2024 (approx)', 'Type': 'Media / Podcast Network', 'Status': 'Active' }
+            }
+        };
+
+        let currentEntityId = 'jordi-hays';
+        let isDetailsPanelExpandedGlobally = false;
+        let isMinimalModeActive = true;
+
+        function loadEntityHtml(entityId) {
+            const center = document.getElementById('centerInfoColumn');
+            if (!entityId) return;
+            const filename = entityId + ".html";
+            center.innerHTML = '<div class="loading">Cargando…</div>';
+            fetch(filename)
+                .then(resp => {
+                    if (!resp.ok) throw new Error('No encontrado');
+                    return resp.text();
+                })
+                .then(html => { center.innerHTML = html; })
+                .catch(err => { center.innerHTML = `<div class="empty-entity"><span class="icon">📄</span>No hay documento para esta entidad.</div>`; });
+        }
+
+        function renderEntity(entityId) {
+            currentEntityId = entityId;
+            const entity = entities[entityId];
+            const container = document.getElementById('entityContainer');
+            const fallbackImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE1MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTgwIiBmaWxsPSIjMWExYTFhIiByeD0iMTYiLz4KPHRleHQgeD0iNzUiIHk9IjkwIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDBmZjg4IiBmb250LXNpemU9IjE0IiBmb250LWZhbWlseT0iSmV0QnJhaW5zIE1vbm8iPklNQUdFPC90ZXh0Pgo8dGV4dCB4PSI3NSIgeT0iMTEwIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDBmZjg4IiBmb250LXNpemU9IjE0IiBmb250LWZhbWlseT0iSmV0QnJhaW5zIE1vbm8iPk5PVCBGT1VORDwvdGV4dD4KPC9zdmc+Cg==';
+
+            if (!entity) {
+                container.innerHTML = `<div class="empty-entity fade-in"><span class="icon">🤷</span>Entity data not found for "${entityId}".<p>Select another entity from the list.</p></div>`;
+                return;
+            }
+             if (Object.keys(entity).length <= 2 && entity.name && !entity.synthesis) {
+                container.innerHTML = `<div class="empty-entity fade-in">
+                                        <span class="icon">⏳</span>
+                                        Abstract for <strong>${entity.name}</strong> is not yet available.
+                                        <p>Content will be added soon.</p>
+                                      </div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="entity-card fade-in">
+                    <div class="entity-photo-container">
+                        <img src="${entity.photo || fallbackImage}" alt="${entity.name}" class="entity-photo" onerror="this.src='${fallbackImage}'">
+                        <div class="entity-name">${entity.name}</div>
+                    </div>
+
+                    <div class="synthesis-runner ${isDetailsPanelExpandedGlobally ? 'expanded-details' : ''}" onclick="toggleDetailsPanel()">
+                        <div class="synthesis-text">${entity.synthesis || 'No synthesis available.'}</div>
+                    </div>
+
+                    <div class="details-panel ${isDetailsPanelExpandedGlobally ? 'expanded' : ''}" id="detailsPanel">
+                        ${entity.basicInfo ? renderDetailSection('📊', 'Core Data', entity.basicInfo, renderInfoGrid) : ''}
+                        ${entity.parents ? renderDetailSection('👨‍👩‍👦', 'Parents', entity.parents, renderInfoGrid) : ''}
+                        ${entity.education ? renderDetailSection('🎓', 'Education', entity.education, renderInfoGrid) : ''}
+                        ${entity.children ? renderDetailSection('👶', 'Children', entity.children, renderChildrenList) : ''}
+                        ${entity.companies ? renderDetailSection('🏢', 'Company History / Associated Ventures', entity.companies, renderCompanyTimeline) : ''}
+                         ${!entity.basicInfo && !entity.parents && !entity.education && !entity.children && !entity.companies && entity.synthesis ? '<p style="text-align:center; padding: 20px; opacity:0.7;">No further detailed information currently available for this entity.</p>' : ''}
+                         ${!entity.synthesis && !entity.basicInfo ? '<p style="text-align:center; padding: 20px; opacity:0.7;">Information for this entity is being compiled.</p>' : ''}
+                    </div>
+                </div>
+            `;
+            updateMinimalModeButton();
+            setTimeout(() => {
+                applyMinimalModeToSections(isMinimalModeActive);
+            }, 0);
+        }
+
+        function renderDetailSection(icon, title, data, rendererFunc) {
+            if (!data || (Array.isArray(data) && data.length === 0) || (typeof data === 'object' && Object.keys(data).length === 0)) return '';
+            return `
+                <div class="detail-section">
+                    <div class="detail-header" onclick="toggleSectionCollapse(this)">
+                        <div class="detail-title">
+                            <span class="detail-icon">${icon}</span>
+                            ${title}
+                        </div>
+                        <span class="detail-collapse">▲</span>
+                    </div>
+                    <div class="detail-content">
+                        ${rendererFunc(data)}
+                    </div>
+                </div>`;
+        }
+        function renderInfoGrid(dataObject) {
+            return `<div class="info-grid">
+                        ${Object.entries(dataObject).map(([key, value]) => `
+                            <div class="info-item">
+                                <div class="info-label">${key}</div>
+                                <div class="info-value">${value || 'N/A'}</div>
+                            </div>`).join('')}
+                    </div>`;
+        }
+        function renderChildrenList(childrenArray) {
+            return `<div class="children-list">
+                        ${childrenArray.map(child => `
+                            <div class="child-item">
+                                <span class="child-name">${child.name}</span>
+                                <span class="child-age">(${child.age})</span>
+                            </div>`).join('')}
+                    </div>`;
+        }
+        function renderCompanyTimeline(companiesArray) {
+            return `<div class="company-timeline">
+                        ${companiesArray.map(company => `
+                            <div class="company-item">
+                                <div class="company-name">${company.name}</div>
+                                <div class="company-role">${company.period || 'N/A'} | ${company.role || 'N/A'}</div>
+                                ${company.details && company.details.length > 0 ? `
+                                    <div class="company-details">
+                                        ${company.details.join('<br>')}
+                                    </div>` : ''}
+                            </div>`).join('')}
+                    </div>`;
+        }
+        function toggleDetailsPanel() {
+            const panel = document.getElementById('detailsPanel');
+            const runner = document.querySelector('.synthesis-runner');
+            if (panel) {
+                isDetailsPanelExpandedGlobally = !panel.classList.contains('expanded');
+                panel.classList.toggle('expanded');
+                if (runner) runner.classList.toggle('expanded-details', isDetailsPanelExpandedGlobally);
+                if (isDetailsPanelExpandedGlobally && !isMinimalModeActive) {
+                    document.querySelectorAll('.detail-section').forEach(section => {
+                        section.classList.remove('collapsed');
+                    });
+                } else if (!isDetailsPanelExpandedGlobally) {
+                     applyMinimalModeToSections(true);
+                }
+            }
+            updateMinimalModeButton();
+        }
+        function toggleSectionCollapse(header) {
+            const section = header.closest('.detail-section');
+            if (section) {
+                section.classList.toggle('collapsed');
+            }
+        }
+        function toggleAllDetailsView() {
+            isMinimalModeActive = !isMinimalModeActive;
+            const panel = document.getElementById('detailsPanel');
+            if (panel) {
+                isDetailsPanelExpandedGlobally = !isMinimalModeActive;
+                panel.classList.toggle('expanded', isDetailsPanelExpandedGlobally);
+                 document.querySelector('.synthesis-runner')?.classList.toggle('expanded-details', isDetailsPanelExpandedGlobally);
+            }
+            applyMinimalModeToSections(isMinimalModeActive);
+            updateMinimalModeButton();
+        }
+        function applyMinimalModeToSections(isMinimal) {
+             document.querySelectorAll('.detail-section').forEach(section => {
+                section.classList.toggle('collapsed', isMinimal);
+            });
+        }
+        function updateMinimalModeButton() {
+            const button = document.querySelector('.collapse-all');
+            if (button) {
+                if (isMinimalModeActive) {
+                    button.textContent = '◐ MINIMAL MODE';
+                } else {
+                     button.textContent = '◑ FULL MODE';
+                }
+            }
+        }
+        // === Cards expandibles para el centro (contenido de cada entidad) ===
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('card-header') || e.target.closest('.card-header')) {
+                const header = e.target.closest('.card-header');
+                const card = header.parentElement;
+                card.classList.toggle('open');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderEntity(currentEntityId);
+            loadEntityHtml(currentEntityId);
+            const navLinks = document.querySelectorAll('.left-nav-column .nav-item a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const previouslyActive = document.querySelector('.left-nav-column .nav-item a.active');
+                    if (previouslyActive) previouslyActive.classList.remove('active');
+                    this.classList.add('active');
+                    const entityId = this.getAttribute('data-entity');
+                    isDetailsPanelExpandedGlobally = false;
+                    isMinimalModeActive = true; 
+                    renderEntity(entityId);
+                    loadEntityHtml(entityId);
+                });
+            });
+            setTimeout(() => {
+                 applyMinimalModeToSections(true);
+                 updateMinimalModeButton();
+            }, 100);
+        });
+    </script>
+</body>
+</html>
