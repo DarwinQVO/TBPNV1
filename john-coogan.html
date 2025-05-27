@@ -1,307 +1,946 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>John Coogan – Research Cards</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>John Coogan</title>
     <style>
-        body {background: #0a0a0a; color: #00ff88; font-family: 'JetBrains Mono', monospace;}
-        .centered-content { max-width: 830px; margin: 40px auto; background: rgba(0,0,0,0.35); border-radius: 22px; box-shadow: 0 0 40px #00ff8815; padding: 28px;}
-        .entity-cards-wrapper {display: flex; flex-direction: column; gap: 20px;}
-        .expandable-card {background: rgba(0,255,136,0.10); border: 1px solid #00ff88; border-radius: 16px; overflow: hidden; box-shadow: 0 0 12px 0 rgba(0,255,136,0.05);}
-        .expandable-card .card-header {padding: 15px 24px; font-size: 1.11rem; font-weight: 600; color: #00ff88; background: rgba(10,10,10,0.88); cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;}
-        .expandable-card .card-title { font-weight: bold;}
-        .expandable-card .card-toggle {font-size: 1.2rem; transition: transform 0.2s;}
-        .expandable-card .card-content {padding: 19px 28px; background: rgba(10,10,10,0.98); border-top: 1px solid #66ff99; display: none;}
-        .expandable-card.open .card-content { display: block; animation: fadeInCard 0.4s;}
-        .expandable-card.open .card-toggle { transform: rotate(180deg);}
+        /* Cards + Interviews for entity content - matching your index styles */
+        .entity-cards-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-bottom: 36px;
+        }
+        
+        .section-header-main {
+            color: #00ff88;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 30px 0 20px 0;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+            padding-bottom: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+        
+        .section-header-main:hover {
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+        }
+        
+        .section-toggle {
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+        
+        .ideas-section.collapsed .section-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .ideas-content {
+            transition: all 0.5s ease-in-out;
+            overflow: hidden;
+            max-height: 10000px; /* Large value to accommodate all content */
+        }
+        
+        .ideas-section.collapsed .ideas-content {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        
+        .expandable-card {
+            background: rgba(0,255,136,0.10);
+            border: 1px solid #00ff88;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 0 12px 0 rgba(0,255,136,0.05);
+            transition: box-shadow 0.3s;
+        }
+        .expandable-card:hover {
+            box-shadow: 0 0 20px 0 rgba(0,255,136,0.15);
+        }
+        .expandable-card .card-header {
+            padding: 14px 24px;
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: #00ff88;
+            background: rgba(10,10,10,0.88);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .expandable-card .card-title-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .expandable-card .card-title {
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .expandable-card .card-synthesis {
+            font-size: 0.85rem;
+            color: #66ff99;
+            opacity: 0.9;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+        .expandable-card .card-toggle {
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+            margin-left: 15px;
+            flex-shrink: 0;
+        }
+        .expandable-card .card-content {
+            padding: 18px 28px;
+            background: rgba(10,10,10,0.98);
+            border-top: 1px solid #66ff99;
+            display: none;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .expandable-card.open .card-content {
+            display: block;
+            animation: fadeInCard 0.4s;
+        }
+        .expandable-card.open .card-toggle {
+            transform: rotate(180deg);
+        }
         @keyframes fadeInCard {from{opacity:0;}to{opacity:1;}}
-        blockquote {background:rgba(0,255,136,0.05);border-left:3px solid #00ff88;padding:15px;margin:10px 0 10px 0;border-radius:6px;font-style:italic;}
-        .interviews-slider-box { margin-top: 38px; background: rgba(0,255,136,0.07); border-radius: 14px; padding: 20px 12px 8px 12px; border: 1px solid #00ff88; width:100%; max-width:720px; box-sizing:border-box;}
-        .interview-slider-controls { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 10px;}
-        .interview-slider-controls button { background:rgba(0,255,136,0.13); border:1px solid #00ff88; color:#00ff88; border-radius:7px; font-size:1rem; padding:2px 10px; cursor:pointer; transition:background 0.2s;}
-        .interview-slider-controls button:hover {background:rgba(0,255,136,0.26);}
-        .interview-item {background: rgba(10,10,10,0.97); border-radius: 12px; box-shadow: 0 0 7px 0 rgba(0,255,136,0.04); border: 1px solid #66ff99; display: flex; flex-direction: column; align-items: center; padding: 12px; width:100%;}
-        .interview-title {font-size:1rem;font-weight:600;margin-bottom:8px;}
-        .interview-video {margin-bottom:10px;}
-        .interview-meta {font-size:0.90rem; color: #66ff99;}
+
+        .interviews-slider-box {
+            margin-top: 38px;
+            background: rgba(0,255,136,0.07);
+            border-radius: 14px;
+            padding: 20px 12px 8px 12px;
+            border: 1px solid #00ff88;
+        }
+        .interviews-slider-box h3 {
+            color: #66ff99;
+            font-size: 1.15rem;
+            margin-bottom: 14px;
+            margin-left: 8px;
+        }
+        .interview-slider {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding-bottom: 12px;
+            scroll-behavior: smooth;
+        }
+        .interview-slider::-webkit-scrollbar {
+            height: 6px;
+        }
+        .interview-slider::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        .interview-slider::-webkit-scrollbar-thumb {
+            background: #00ff88;
+            border-radius: 10px;
+        }
+        .interview-item {
+            background: rgba(10,10,10,0.97);
+            border-radius: 12px;
+            min-width: 350px;
+            max-width: 370px;
+            box-shadow: 0 0 7px 0 rgba(0,255,136,0.04);
+            border: 1px solid #66ff99;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            flex-shrink: 0;
+        }
+        .interview-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #00ff88;
+            line-height: 1.3;
+        }
+        .interview-video {
+            margin-bottom: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .interview-video iframe {
+            width: 100%;
+            height: 200px;
+            border: none;
+        }
+        .interview-meta {
+            font-size: 0.85rem; 
+            color: #66ff99;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Quote styling */
+        .quote {
+            background: rgba(0,255,136,0.05);
+            border-left: 3px solid #00ff88;
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-style: italic;
+            border-radius: 0 8px 8px 0;
+        }
+        .quote-source {
+            font-size: 0.85rem;
+            color: #66ff99;
+            margin-top: 8px;
+            font-style: normal;
+        }
+        .quote-source a {
+            color: #66ff99;
+            text-decoration: underline;
+        }
+        .quote-source a:hover {
+            color: #00ff88;
+        }
+
+        /* Section headers within cards */
+        .section-header {
+            color: #00ff88;
+            font-weight: bold;
+            margin: 16px 0 8px 0;
+            font-size: 1.05rem;
+        }
+
+        /* General styling */
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f1a0f 100%);
+            color: #66ff99;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Links in content */
+        a {
+            color: #66ff99;
+            text-decoration: underline;
+        }
+        a:hover {
+            color: #00ff88;
+        }
     </style>
 </head>
 <body>
-    <div class="centered-content" id="centeredContent">
-        <div class="entity-cards-wrapper">
-
-            <!-- Main Ideas & Insights (17 secciones anidadas, fieles al archivo) -->
-            <div class="expandable-card open">
-                <div class="card-header">
-                    <span class="card-title">💡 Ideas & Insights (Overview)</span>
+    <div class="content-wrapper">
+        
+        <!-- IDEAS SECTION -->
+        <div class="ideas-section">
+            <div class="section-header-main" onclick="event.stopPropagation(); toggleIdeasSection()">
+                <span>💡 IDEAS</span>
+                <span class="section-toggle">▲</span>
+            </div>
+            
+            <div class="ideas-content">
+                <div class="entity-cards-wrapper">
+            
+            <!-- Peter Thiel Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Peter Thiel's Assessment</div>
+                        <div class="card-synthesis">Peter Thiel told John that Soylent was "just a widgets business" and advised running it like any traditional business, calling it a great lifestyle business but warning that raising venture capital would be a disaster</div>
+                    </div>
                     <span class="card-toggle">▼</span>
                 </div>
-                <div class="card-content" style="display:block;">
-                    <p>John Coogan's key learnings, business philosophy, and insights from building Soylent, Lucy, and his YouTube channel. These ideas shape his approach to entrepreneurship and content creation.</p>
-
-                    <!-- 1 -->
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">Peter Thiel's Advice</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <div style="color:#66ff99;margin-bottom:12px;font-size:0.9rem;"><strong>Context:</strong> Peter Thiel's feedback about Soylent's business model and why it should have been run as a lifestyle business, not a venture startup.</div>
-                            <blockquote>
-"We went in for the pitch and sat down [with Peter Thiel] And Peter was just kind of like, 'Yeah, this is just a widgets business. Run this like any other business. You need to sell. You have product–market fit, you just need to maximize. Run the playbook: bring the customer in, make sure you're bringing them in cheaper.' He was basically like, 'This is a great lifestyle business, guys. Congrats.' And then we raised a bunch of venture, and it was a disaster"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/vwum3O-sNKE?t=753" target="_blank">John (Sep 2023)</a></small>
-                            </blockquote>
-                        </div>
-                    </div>
-
-                    <!-- 2 -->
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">Soylent → Lucy Learnings</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <div style="color:#66ff99;margin-bottom:12px;font-size:0.9rem;"><strong>Context:</strong> How learning from Soylent's mistakes and keeping the core team helped Lucy focus on quality and adapt quickly.</div>
-                            <blockquote>
-"It's very very hard to start one of these companies and I couldn't have done it unless we had the first company under our belt"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/CTFSSNtHqcs?list=PLPvvoS-ziBwyk7EbNTG9nLdYU8l7tCNUj&t=1694" target="_blank">John, Terra Api, 7/23</a></small>
-                            </blockquote>
-                            <blockquote>
-"We were definitely sharper on the manufacturing side—made fewer mistakes [with Lucy]. Made fewer mistakes in a lot of different ways. Just had a much, much higher focus on quality, on keeping things in stock, and on doing best practices from day one"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/CTFSSNtHqcs?t=1789" target="_blank">John (Jun 2023)</a></small>
-                            </blockquote>
-                            <blockquote>
-"We kept a lot of the same team. I think 4 of the core people at Soylent came over to Lucy, and that was basically our first 4 people. As we grew, we were definitely hiring for flexibility, because we knew there would be a pivot point where we'd move from DTC to retail. Having the ability to actually change how the business works over time and be flexible in that regard was important. We were also focused on people who were really, really good at leveraging existing tools. So we really tried to lean into the existing platforms and keep the company lean. Even today, I think we're still under 10 people. It's pretty small"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/CTFSSNtHqcs?t=1813" target="_blank">John (Jun 2023)</a></small>
-                            </blockquote>
-                        </div>
-                    </div>
-
-                    <!-- 3 -->
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">Lucy's Founding Story</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <div style="color:#66ff99;margin-bottom:12px;font-size:0.9rem;"><strong>Context:</strong> The motivation and story behind the launch of Lucy, centered around nicotine harm reduction and founder experience.</div>
-                            <blockquote>
-<strong>Nicotine is the future</strong><br>
-"David Renteln was smoking kind of casually. [...] So he started looking at the problem from a more scientific perspective"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/G9etFvIvL8Q?t=1971" target="_blank">John (Jul 2020)</a></small>
-                            </blockquote>
-                            <blockquote>
-"We started a second company, called Lucy, with the goal of helping people quit smoking. One of my co-founders was quitting smoking, and a lot of our friends were vaping. We knew that there were going to be people who wanted to quit. Nicorette wasn't really doing the job for a lot of people—they kind of saw it as more of a medicine. So we thought we could create a new nicotine gum, new nicotine products, to try and help people get off of the hardcore stuff like cigarettes."<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/AZPuGYX6eTA?t=337" target="_blank">John (Jul 2023)</a></small>
-                            </blockquote>
-                        </div>
-                    </div>
-
-                    <!-- 4 -->
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">Lucy Marketing Strategy</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <div style="color:#66ff99;margin-bottom:12px;font-size:0.9rem;"><strong>Context:</strong> The deliberate marketing focus to avoid Juul's mistakes and ensure the brand's targeting was responsible.</div>
-                            <blockquote>
-"We kind of shied away from going broad and viral with our marketing because Juul had already gone viral in the tobacco and nicotine space, and they wound up attracting a bunch of kids, which was very detrimental to their business in the long term. We didn't want to get kids to use this. We really wanted to focus on that older millennial consumer. So we were much more targeted, on Facebook, Instagram, and podcasts, really trying to get it into the right people's hands"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/CTFSSNtHqcs?t=1725" target="_blank">John (Jun 2023)</a></small>
-                            </blockquote>
-                        </div>
-                    </div>
-
-                    <!-- 5 -->
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">Lucy Today (Current Role)</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <div style="color:#66ff99;margin-bottom:12px;font-size:0.9rem;"><strong>Context:</strong> John's present-day role at Lucy, working on content and strategic deals.</div>
-                            <blockquote>
-"I'm one day a week at Lucy, mostly helping out with stuff like doing content and then, ideally, brokering deals with other content creators"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/vwum3O-sNKE?t=898" target="_blank">John (Sep 2023)</a></small>
-                            </blockquote>
-                        </div>
-                    </div>
-                    <!-- 6 -->
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">@JohnCooganPlus YouTube Origin</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <div style="color:#66ff99;margin-bottom:12px;font-size:0.9rem;"><strong>Context:</strong> How John started on YouTube, the Clubhouse context, and his early experiments.</div>
-                            <blockquote>
-"In early 2020, I couldn't get an invite to Clubhouse. All the cool kids were hanging out there. So I made a <a href='https://www.youtube.com/watch?v=jQK16Uz_sTM' target='_blank'>YouTube video analyzing Clubhouse</a> [on his old channel, <a href='https://www.youtube.com/@Termsheets' target='_blank'>Termsheets</a>]. Everyone was saying it was massively overvalued, and I was kind of like, 'Hey, it doesn't matter. They're taking a big risk, they're taking a big shot. At $100M, yeah, it probably wound up being overvalued—but at the very least, just let them go and experiment.'"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/s0qovRw7-tA?t=173" target="_blank">John (Sep 2023)</a></small>
-                            </blockquote>
-                            <blockquote>
-"During COVID, I was just bored and had free time for the first time in like a decade of entrepreneurship. But it was very clear that it was a time where, if you got louder online, you could actually make friends and meet new people. I just kind of thought it would be interesting to do the traditional take on 'Here's an opinion about technology' or 'Here's the history of a company,' but with more of a YouTube-native format. There were a couple of channels that would do something like 'The history of Apple,' but it was very much from an outsider's perspective"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/BXYWOf016rQ?t=250" target="_blank">John (Nov 2024)</a></small>
-                            </blockquote>
-                        </div>
-                    </div>
-                    <!-- 7 -->
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">First Year of YouTube (The Grind)</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <div style="color:#66ff99;margin-bottom:12px;font-size:0.9rem;"><strong>Context:</strong> The grind, the lack of traction, and what John learned about process and community.</div>
-                            <blockquote>
-"The first year was really slow. I think it took almost a full year to get more than a hundred views on a video, like 50 episodes in a row. But I didn't care. I didn't know what success looked like, because at the time, I was the only person in tech doing this. Garry Tan was around, but he was already huge. I wasn't even comparing myself to him. When I finally broke 100 views on a video, I was fired up. I was like, 'This one's a banger!' I just loved the process. I was learning motion graphics, spending hours in After Effects"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/dIcfh1rDAsE?t=4347" target="_blank">John (Apr 2025)</a></small>
-                            </blockquote>
-                        </div>
-                    </div>
-                    <!-- 8 -->
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">First Viral Videos (Breakthrough)</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <div style="color:#66ff99;margin-bottom:12px;font-size:0.9rem;"><strong>Context:</strong> Which topics and content finally went viral, and why.</div>
-                            <blockquote>
-<strong>Title:</strong> <a href="https://www.youtube.com/watch?v=K1xWaua-nLI" target="_blank">The Only Reason SpaceX Works (Gwynne Shotwell)</a><br>
-"The very first one was about <a href='https://www.youtube.com/watch?v=K1xWaua-nLI' target='_blank'>SpaceX</a>, and it was about a topic that a VC had told me years ago, that everyone gives Elon all the credit, and obviously he deserves a ton of credit for SpaceX… So it hit a few different things. First off, everyone likes looking at rockets, and Elon is also a household name. It's much harder to make a viral video about some small SAAS company that only people in tech know about… That video blew up and got around 60,000 views, which was really big"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/BXYWOf016rQ?t=484" target="_blank">John (Nov 2024)</a></small>
-                            </blockquote>
-                            <blockquote>
-<strong>Title:</strong> <a href="https://www.youtube.com/watch?v=QvZSdDC9rWo" target="_blank">You Don't Know the Metaverse...</a><br>
-"Then later, when the metaverse stuff happened, those videos started getting millions and millions of views. That was the first time it went really, really big, because it was something that the mainstream media was talking about. Because I was in tech, I'd been talking about it with everyone months before. People in the space kind of knew there was going to be this VR resurgence. There was a discussion about it in tech, but it took a while until Zuck rebranded to Meta. That was the moment when everyone needed to talk about it. Just being early there, with some really solid content. By then I had really figured out the format, really figured out the thumbnails and all that stuff — the <a href='https://www.youtube.com/watch?v=QvZSdDC9rWo' target='_blank'>video</a> just went mega viral"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/BXYWOf016rQ?t=484" target="_blank">John (Nov 2024)</a></small>
-                            </blockquote>
-                        </div>
-                    </div>
-                    <!-- 9 -->
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">Benefits of Running a Channel</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <div style="color:#66ff99;margin-bottom:12px;font-size:0.9rem;"><strong>Context:</strong> How making YouTube content led to connections with entrepreneurs, hiring, and storytelling skills.</div>
-                            <blockquote>
-"A great way to meet an entrepreneur is make a video about their company."<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/s0qovRw7-tA?t=307" target="_blank">John, Media Empires, 09/23</a></small>
-                            </blockquote>
-                            <blockquote>
-"[My channel] has helped with hiring. It's just great. Obviously, you're putting content out to a lot of people—it's very easy to pull from that audience to hire someone if you need to. And then, on a bigger scale, it's just helped with storytelling"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/5MyQPjzSvW4?t=3313" target="_blank">John (Feb 2023)</a></small>
-                            </blockquote>
-                        </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "We went in for the pitch and sat down [with Peter Thiel] And Peter was just kind of like, 'Yeah, this is just a widgets business. Run this like any other business. You need to sell. You have product–market fit, you just need to maximize. Run the playbook: bring the customer in, make sure you're bringing them in cheaper.' He was basically like, 'This is a great lifestyle business, guys. Congrats.' And then we raised a bunch of venture, and it was a disaster"
+                        <div class="quote-source"><a href="https://youtu.be/vwum3O-sNKE?t=753" target="_blank">John (Sep 2023)</a></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Business Philosophy & Future -->
+            <!-- Soylent to Lucy Card -->
             <div class="expandable-card">
-                <div class="card-header"><span class="card-title">💼 Business Philosophy & Future</span><span class="card-toggle">▼</span></div>
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Soylent Learnings Applied to Lucy</div>
+                        <div class="card-synthesis">John couldn't have started Lucy without Soylent experience. 4 core Soylent team members joined Lucy as first employees. They focused on manufacturing quality, staying lean under 10 people, and hiring flexible team members who leveraged existing tools</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
                 <div class="card-content">
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">Building for the Long Term</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <blockquote>
-"The biggest lesson from Soylent is that sometimes the right path isn't the obvious venture path. There's real value in building profitable, sustainable businesses that don't need to grow at all costs"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/vwum3O-sNKE?t=1200" target="_blank">John (Sep 2023)</a></small>
-                            </blockquote>
-                        </div>
+                    <div class="quote">
+                        "It's very very hard to start one of these companies and I couldn't have done it unless we had the first company under our belt"
+                        <div class="quote-source"><a href="https://youtu.be/CTFSSNtHqcs?list=PLPvvoS-ziBwyk7EbNTG9nLdYU8l7tCNUj&t=1694" target="_blank">John, Terra Api, 7/23</a></div>
                     </div>
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">Founders Fund Role</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <blockquote>
-"Being at Founders Fund has given me a unique perspective on what makes companies successful at scale. It's not just about the initial idea - it's about execution, timing, and having the right team to navigate challenges"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/KYkReFrm7Wg?t=1500" target="_blank">John (Jul 2024)</a></small>
-                            </blockquote>
-                        </div>
+                    
+                    <div class="section-header">Team Continuity</div>
+                    <div class="quote">
+                        "We kept a lot of the same team. I think 4 of the core people at Soylent came over to Lucy, and that was basically our first 4 people. As we grew, we were definitely hiring for flexibility, because we knew there would be a pivot point where we'd move from DTC to retail. Having the ability to actually change how the business works over time and be flexible in that regard was important. We were also focused on people who were really, really good at leveraging existing tools. So we really tried to lean into the existing platforms and keep the company lean. Even today, I think we're still under 10 people. It's pretty small"
+                        <div class="quote-source"><a href="https://youtu.be/CTFSSNtHqcs?t=1813" target="_blank">John (Jun 2023)</a></div>
                     </div>
-                    <div class="expandable-card">
-                        <div class="card-header"><span class="card-title">Content Creation Philosophy</span><span class="card-toggle">▼</span></div>
-                        <div class="card-content">
-                            <blockquote>
-"Consistency beats perfection every time. I'd rather put out a good video every week than spend months on one perfect video. The audience appreciates the regular value, and you learn faster by shipping more frequently"<br>
-<small style="color:#66ff99;">— <a href="https://youtu.be/s0qovRw7-tA?t=400" target="_blank">John (Sep 2023)</a></small>
-                            </blockquote>
-                        </div>
+
+                    <div class="section-header">Learning from Soylent's mistakes</div>
+                    <div class="quote">
+                        "We were definitely sharper on the manufacturing side—made fewer mistakes [with Lucy]. Made fewer mistakes in a lot of different ways. Just had a much, much higher focus on quality, on keeping things in stock, and on doing best practices from day one"
+                        <div class="quote-source"><a href="https://youtu.be/CTFSSNtHqcs?t=1789" target="_blank">John (Jun 2023)</a></div>
                     </div>
                 </div>
             </div>
 
-            <!-- INDEPENDENT CARDS -->
+            <!-- Lucy Founding Card -->
             <div class="expandable-card">
-                <div class="card-header"><span class="card-title">💰 Investments from YouTube</span><span class="card-toggle">▼</span></div>
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Lucy's Founding Story</div>
+                        <div class="card-synthesis">Lucy was founded to help people quit smoking when co-founder David Renteln's wife pointed out his casual smoking habit. They created nicotine alternatives because Nicorette felt too medicinal, targeting the gap between hardcore cigarettes and effective cessation products</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
                 <div class="card-content">
-                    <p>He's also said that he's <a href="https://youtu.be/5MyQPjzSvW4?t=2032" target="_blank">made investments</a> in startups that have met him through the YouTube channel. This demonstrates how content creation can open doors to investment opportunities and business relationships.</p>
+                    <div class="section-header">Nicotine is the future</div>
+                    <div class="quote">
+                        "<a href="https://www.linkedin.com/in/drenteln/" target="_blank">David Renteln</a> was smoking kind of casually. He was having a few cigarettes whenever he'd get a drink with friends. His wife told him he's a smoker, but he, of course, insisted, 'No, I don't smoke all the time. I only smoke when I'm getting drinks with friends.' But she said, 'Yeah, but you get drinks with friends five nights a week. You're still smoking a bunch. So he started looking at the problem from a more scientific perspective"
+                        <div class="quote-source"><a href="https://youtu.be/G9etFvIvL8Q?t=1971" target="_blank">John (Jul 2020)</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "We started a second company, called Lucy, with the goal of helping people quit smoking. One of my co-founders was quitting smoking, and a lot of our friends were vaping. We knew that there were going to be people who wanted to quit. Nicorette wasn't really doing the job for a lot of people — they kind of saw it as more of a medicine. So we thought we could create a new nicotine gum, new nicotine products, to try and help people get off of the hardcore stuff like cigarettes."
+                        <div class="quote-source"><a href="https://youtu.be/AZPuGYX6eTA?t=337" target="_blank">John (Jul 2023)</a></div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Lucy Marketing Strategy Card -->
             <div class="expandable-card">
-                <div class="card-header"><span class="card-title">💼 Career and Jobs</span><span class="card-toggle">▼</span></div>
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Lucy Marketing Strategy</div>
+                        <div class="card-synthesis">Lucy avoided broad viral marketing after learning from Juul's mistakes with attracting minors. Instead focused on targeted Facebook, Instagram, and podcast advertising specifically aimed at older millennials to ensure responsible distribution</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
                 <div class="card-content">
-                    <blockquote>
-"I worked several full time jobs in college [internships], but didn't accept a job offer after graduation"<br>
-<small style="color:#66ff99;">— <a href="https://x.com/johncoogan/status/1896813459255542034" target="_blank">John</a></small>
-                    </blockquote>
-                    <p>This early decision to skip traditional employment and jump straight into entrepreneurship shaped his entire career trajectory.</p>
+                    <div class="quote">
+                        "We kind of shied away from going broad and viral with our marketing because <a href="https://www.juul.com" target="_blank">Juul</a> had already gone viral in the tobacco and nicotine space, and they wound up attracting a bunch of kids, which was very detrimental to their business in the long term. We didn't want to get kids to use this. We really wanted to focus on that older millennial consumer. So we were much more targeted, on Facebook, Instagram, and podcasts, really trying to get it into the right people's hands"
+                        <div class="quote-source"><a href="https://youtu.be/CTFSSNtHqcs?t=1725" target="_blank">John (Jun 2023)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lucy Today Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Lucy Today</div>
+                        <div class="card-synthesis">As of 2023, John spends one day per week at Lucy focusing on content creation and brokering deals with other content creators, maintaining limited involvement while focusing on other ventures</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="section-header">As of 2023 at least...</div>
+                    <div class="quote">
+                        "I'm one day a week at Lucy, mostly helping out with stuff like doing content and then, ideally, brokering deals with other content creators"
+                        <div class="quote-source"><a href="https://youtu.be/vwum3O-sNKE?t=898" target="_blank">John (Sep 2023)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YouTube Origins Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">@JohnCooganPlus YouTube Origin</div>
+                        <div class="card-synthesis">Started YouTube in 2020 during COVID when couldn't get Clubhouse invite. First year was slow with 50+ episodes under 100 views each. Loved the process of learning motion graphics and creating tech content from an insider's perspective</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "In early 2020, I couldn't get an invite to Clubhouse. All the cool kids were hanging out there. So I made a <a href="https://www.youtube.com/watch?v=jQK16Uz_sTM" target="_blank">YouTube video analyzing Clubhouse</a> [on his old channel, <a href="https://www.youtube.com/@Termsheets" target="_blank">Termsheets</a>]. Everyone was saying it was massively overvalued, and I was kind of like, 'Hey, it doesn't matter. They're taking a big risk, they're taking a big shot. At $100M, yeah, it probably wound up being overvalued—but at the very least, just let them go and experiment'"
+                        <div class="quote-source"><a href="https://youtu.be/s0qovRw7-tA?t=173" target="_blank">John (Sep 2023)</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "During COVID, I was just bored and had free time for the first time in like a decade of entrepreneurship. But it was very clear that it was a time where, if you got louder online, you could actually make friends and meet new people. I just kind of thought it would be interesting to do the traditional take on 'Here's an opinion about technology' or 'Here's the history of a company,' but with more of a YouTube-native format. There were a couple of channels that would do something like 'The history of Apple,' but it was very much from an outsider's perspective"
+                        <div class="quote-source"><a href="https://youtu.be/BXYWOf016rQ?t=250" target="_blank">John (Nov 2024)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1st Year YouTube Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">1st Year of Uploading to YouTube</div>
+                        <div class="card-synthesis">The first year was extremely slow with almost a full year to get over 100 views on a video. 50+ episodes in a row with minimal views, but John loved the process of learning motion graphics and spending hours in After Effects</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "The first year was really slow. I think it took almost a full year to get more than a hundred views on a video, like 50 episodes in a row. But I didn't care. I didn't know what success looked like, because at the time, I was the only person in tech doing this. Garry Tan was around, but he was already huge. I wasn't even comparing myself to him. When I finally broke 100 views on a video, I was fired up. I was like, 'This one's a banger!' I just loved the process. I was learning motion graphics, spending hours in After Effects"
+                        <div class="quote-source"><a href="https://youtu.be/dIcfh1rDAsE?t=4347" target="_blank">John (Apr 2025)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1st Viral Videos Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">1st Viral Videos</div>
+                        <div class="card-synthesis">First viral video about SpaceX hit 60K views, focusing on Gwynne Shotwell's role. Later, Metaverse content went mega-viral with millions of views during Facebook's Meta rebrand, benefiting from being early to the topic</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="section-header">Title: <a href="https://www.youtube.com/watch?v=K1xWaua-nLI" target="_blank">The Only Reason SpaceX Works (Gwynne Shotwell)</a></div>
+                    <div class="quote">
+                        "The very first one was about <a href="https://www.youtube.com/watch?v=K1xWaua-nLI" target="_blank">SpaceX</a>, and it was about a topic that a VC had told me years ago, that everyone gives Elon all the credit, and obviously he deserves a ton of credit for SpaceX… So it hit a few different things. First off, everyone likes looking at rockets, and Elon is also a household name. It's much harder to make a viral video about some small SAAS company that only people in tech know about… That video blew up and got around 60,000 views, which was really big"
+                        <div class="quote-source"><a href="https://youtu.be/BXYWOf016rQ?t=484" target="_blank">John (Nov 2024)</a></div>
+                    </div>
+
+                    <div class="section-header">Title: <a href="https://www.youtube.com/watch?v=QvZSdDC9rWo" target="_blank">You Don't Know the Metaverse...</a></div>
+                    <div class="quote">
+                        "Then later, when the metaverse stuff happened, those videos started getting millions and millions of views. That was the first time it went really, really big, because it was something that the mainstream media was talking about. Because I was in tech, I'd been talking about it with everyone months before. People in the space kind of knew there was going to be this VR resurgence. There was a discussion about it in tech, but it took a while until Zuck rebranded to Meta. That was the moment when everyone needed to talk about it. Just being early there, with some really solid content. By then I had really figured out the format, really figured out the thumbnails and all that stuff — the <a href="https://www.youtube.com/watch?v=QvZSdDC9rWo" target="_blank">video</a> just went mega viral"
+                        <div class="quote-source"><a href="https://youtu.be/BXYWOf016rQ?t=484" target="_blank">John (Nov 2024)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benefits of Running Channel Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Benefits of Running a Channel</div>
+                        <div class="card-synthesis">YouTube channel serves as powerful networking tool - making videos about companies is great way to meet entrepreneurs. Helps with hiring by building audience, and generally assists with storytelling for business purposes</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "A great way to meet an entrepreneur is make a video about their company."
+                        <div class="quote-source"><a href="https://youtu.be/s0qovRw7-tA?t=307" target="_blank">John, Media Empires, 09/23</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "[My channel] has helped with hiring. It's just great. Obviously, you're putting content out to a lot of people—it's very easy to pull from that audience to hire someone if you need to. And then, on a bigger scale, it's just helped with storytelling"
+                        <div class="quote-source"><a href="https://youtu.be/5MyQPjzSvW4?t=3313" target="_blank">John (Feb 2023)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YouTube Strategy Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">YouTube Strategy</div>
+                        <div class="card-synthesis">Unique positioning in Silicon Valley analysis on YouTube. Strategy focuses on attracting young hackers who'll contact him years later. Studies MrBeast for creator insights, plans podcast feed for older Silicon Valley insiders</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "There aren't really that many people that are looking at YouTube as a way to promote actual Silicon Valley analysis"
+                        <div class="quote-source"><a href="https://youtu.be/s0qovRw7-tA?t=858" target="_blank">John, Media Empires, 09/23</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "The core needs to be a really great YouTube presence that can attract all of the crazy hackers 16y/o 18y/o right now and then in a couple of years they are calling you basically."
+                        <div class="quote-source"><a href="https://youtu.be/s0qovRw7-tA?t=1891" target="_blank">John, Media Empires, 09/23</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "Whenever I have one of these questions I always just kind look to Mr.Beast because he is the biggest creator, he takes it the most seriously"
+                        <div class="quote-source"><a href="https://youtu.be/s0qovRw7-tA?t=1528" target="_blank">John, Media Empires, 09/23</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "I do wanna reach the older cohort of Silicon Valley insiders … My plan to do that is basically create a podcast feed"
+                        <div class="quote-source"><a href="https://youtu.be/s0qovRw7-tA?t=1863" target="_blank">John, Media Empires, 09/23</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "I want to increase optimism around technology. We have many problems to solve and a lot of challenges in front of us. It seems pretty clear to me that we need more technology to solve these problems. Many YouTube content is very negative (because that's what people tend to click on), but I try to find more positive and optimistic angles wherever possible"
+                        <div class="quote-source"><a href="https://metaverseinsider.tech/2022/05/04/john-coogan-is-an-entrepreneur-using-youtube-to-explore-the-metaverse/#:~:text=%E2%80%9CI%20want%20to,angles%20wherever%20possible.%E2%80%9D" target="_blank">John, The Metaverse Insider, 05/22</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "The way inject drama in a story was, I used the title: 'Microsoft just Killed Zucks Metaverse' and so that's very dramatic, there's a clear protagonist and antagonist, people feel very strongly about Microsoft, some people hate Microsoft..., some people love Facebook or hate Facebook"
+                        <div class="quote-source"><a href="https://youtu.be/CTFSSNtHqcs?list=PLPvvoS-ziBwyk7EbNTG9nLdYU8l7tCNUj&t=854" target="_blank">John, Terra Api, 07/23</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "The strategy is to pick a topic that I think is interesting and really deep, and just try to make the best video about that topic"
+                        <div class="quote-source"><a href="https://youtu.be/BXYWOf016rQ?t=677" target="_blank">John (Nov 2024)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Creation Process Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Content Creation Process</div>
+                        <div class="card-synthesis">Prefers researching existing podcast interviews over conducting new founder interviews due to time efficiency. Direct interviews add authenticity but slow down production with booking, recording, and review steps</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "I'll interview the founder—that actually tends to slow down the process. I actually prefer to just go and look at their other podcast interviews and build the video from scratch. But it is valuable, especially if the founder hasn't been on a lot of podcasts, to sit down with them and interview them. It adds a different layer of intrigue to say, 'Okay, we actually went and got primary source material.' It's very, very interesting when that can happen. It does take more time, though—you have to book it, do it, record it, then review the script and see where the good parts are. It's not super quick. It definitely adds a step to the production"
+                        <div class="quote-source"><a href="https://youtu.be/CTFSSNtHqcs?t=2447" target="_blank">John (Jun 2023)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Joining FF through Mike Solana Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Joining FF through Mike Solana</div>
+                        <div class="card-synthesis">Connected with Founders Fund through Mike Solana during COVID Twitter discussions. Spoke at Hereticon about nicotine misconceptions as classic Thielian secret where reality and science don't match public perception</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "During COVID, I think I started chatting with Mike Solana a bunch, who was the CMO there, and was just talking about crazy stuff on Twitter. I wound up doing his podcast. Then I <a href="https://www.youtube.com/watch?v=6EHE-hHg49k" target="_blank">spoke</a> at <a href="https://www.hereticon.com/" target="_blank">Hereticon</a>. I gave a talk about how nicotine is secretly this wildly misunderstood thing — it's kind of the classic Thielian secret, where reality and science do not match the public perception."
+                        <div class="quote-source"><a href="https://youtu.be/KYkReFrm7Wg?t=106" target="_blank">John (Jul 2024)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Helping FF with Video Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Helping FF with Video</div>
+                        <div class="card-synthesis">Joined Founders Fund as EIR to build YouTube channel covering defense tech portfolio companies. Not an investor but content creator and brand asset, focusing on companies like Palantir and Anduril</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "A lot of the companies I wanted to talk about that were interesting were Founders Fund companies. From there, I started getting introduced to more and more people. They were like, 'Hey, you look like you might be kind of thinking about what's next. Do you want to come and hang out, figure out what's next, make some cool content, and hang out with the team?' And I was like, 'Yeah, that sounds awesome.'"
+                        <div class="quote-source"><a href="https://youtu.be/KYkReFrm7Wg?t=106" target="_blank">John (Jul 2024)</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "They reached out to chat about what doing something on video would look like, and coming on as an EIR seemed like a good fit, where I could come in, build a YouTube channel, focus on covering their companies, but also just generally be an asset to the brand team broadly. I've been very focused on the work they've done in defense specifically, because even though I don't know all that much about it, it's really fun to learn about. They've been investing in defense technology for decades now."
+                        <div class="quote-source"><a href="https://youtu.be/CTFSSNtHqcs?t=1925" target="_blank">John (Jun 2023)</a></div>
+                    </div>
+
+                    <div class="section-header">Defense tech focused videos</div>
+                    <p><a href="https://www.youtube.com/watch?v=EIX7hnkJiuY" target="_blank">Palantir: The App That Caught Bin Laden</a> | <a href="https://www.youtube.com/watch?v=UI4l-o4AcHs&t=4s" target="_blank">Anduril - The Startup Reshaping Geopolitics</a></p>
+
+                    <div class="quote">
+                        "When I came in, I was like, 'Hey, there's a bunch of things I could do while I'm here to help founders.' I could start by interviewing every founder in the portfolio, or I could talk to all the partners and do something about who the team is. And they were like, 'Look, we really want to focus on defense tech. We really want to highlight the companies we've worked with—why don't you go talk about that?' And I was like, 'Yeah, that sounds really awesome, and I want to do that anyway.' So it just worked out really well"
+                        <div class="quote-source"><a href="https://youtu.be/AZPuGYX6eTA?t=790" target="_blank">John (Jul 2023)</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "We do some stuff on YouTube at Founders Fund, and obviously I'm chiming in there. I'm like, 'Hey, this is how we should edit this,' or whatever"
+                        <div class="quote-source"><a href="https://youtu.be/wr6a5NF1mJ8?t=2135" target="_blank">John (Aug 2023)</a></div>
+                    </div>
+
+                    <div class="section-header">Not an investor</div>
+                    <div class="quote">
+                        "I'm not an investor there. I'm not on the investment team. As an entrepreneur in residence, I'm kind of building content, but also building other things"
+                        <div class="quote-source"><a href="https://youtu.be/wr6a5NF1mJ8?t=2039" target="_blank">John (Aug 2023)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Happiness Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Happiness Theory</div>
+                        <div class="card-synthesis">John's theory of happiness involves Shepard Tones and Barber Poles as metaphors for continuous progress illusions. Like barber poles that appear to go up endlessly but restart cycles, happiness requires fractal patterns of perceived advancement</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="section-header">John's theory of happiness: <a href="https://www.youtube.com/watch?v=BzNzgsAE4F0" target="_blank">Shepard Tone</a> and <a href="https://en.wikipedia.org/wiki/Barber%27s_pole" target="_blank">Barber Poles</a></div>
+                    <div class="quote">
+                        "If you look at a <a href="https://en.wikipedia.org/wiki/Barber%27s_pole" target="_blank">barber pole</a>, it's striped like a candy cane. If you watch it, it looks like it's going up endlessly. But what's really happening is that it's going to the other side and it's restarting the cycle. <a href="https://www.youtube.com/watch?v=BzNzgsAE4F0" target="_blank">Shepard tone</a> does the same thing. It's a whole bunch of scales playing at the same time. It's a fractal pattern"
+                        <div class="quote-source"><a href="https://youtu.be/SjCj84YSwGA?t=2425" target="_blank">John (Jan 10, 2025)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Techno-Optimism Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Techno-Optimism</div>
+                        <div class="card-synthesis">Promotes technology optimism to solve global challenges. Uses "Trojan horse" approach - negative titles to attract pessimistic viewers, then convinces them with optimistic arguments about technology's potential</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "I want to increase optimism around technology. We have many problems to solve and a lot of challenges in front of us. It seems pretty clear to me that we need more technology to solve these problems"
+                        <div class="quote-source"><a href="https://metaverseinsider.tech/2022/05/04/john-coogan-is-an-entrepreneur-using-youtube-to-explore-the-metaverse/#:~:text=%E2%80%9CI%20want%20to,angles%20wherever%20possible.%E2%80%9D" target="_blank">John, The Metaverse Insider, 05/22</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "I saw that YouTube was negative and I wanted to pull things back the other direction. A lot of my content is framed almost in the negative to attract people who might be clicking on negative content, but then once they get deeper in the video they find out I am actually making an optimistic argument about the technology and then maybe I convince them"
+                        <div class="quote-source"><a href="https://youtu.be/5MyQPjzSvW4?t=2113" target="_blank">John, Danny Miranda Show, 02/23</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sigmoid Grindset Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Sigmoid Grindset</div>
+                        <div class="card-synthesis">Philosophy of understanding that exponential growth periods will plateau, requiring constant reinvention and finding new paradigms. Based on sigmoid function curve patterns in business and life</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "You need to be on the <a href="https://en.wikipedia.org/wiki/Sigmoid_function" target="_blank">sigmoid grindset</a>. You need to understand that you're going to go through bursts of explosive exponential growth, but those exponential growth periods will stop"
+                        <div class="quote-source"><a href="https://youtu.be/J3bfFspsQQc?list=PLBV_0ax_G8bowGFK97Nrv0DBmxaDObKgA&t=1389" target="_blank">John (May 16, 2025)</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "You have to be constantly reinventing yourself. Finding new paradigms"
+                        <div class="quote-source"><a href="https://youtu.be/J3bfFspsQQc?list=PLBV_0ax_G8bowGFK97Nrv0DBmxaDObKgA&t=1423" target="_blank">John (May 16, 2025)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Content Insights</div>
+                        <div class="card-synthesis">Believes money can't shortcut YouTube success. Long-form content performs well due to higher average view duration. Explains how creators like Lex Fridman benefit from 3x length content even with lower click-through rates</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "No one has figured out how to short circuit YouTube with money, and if that was the case I would have spent way more money earlier obviously"
+                        <div class="quote-source"><a href="https://youtu.be/s0qovRw7-tA?t=3144" target="_blank">John, Media Empires, 09/23</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "The reason [Long Form] blew up on YouTube is because they're uploading 3 hour shows and even if people don't watch the whole thing there's so much there that the signal to YouTube is 'Hey, on average people spend 1 hour here'"
+                        <div class="quote-source"><a href="https://youtu.be/s0qovRw7-tA?t=1288" target="_blank">John, Media Empires, 09/23</a></div>
+                    </div>
+
+                    <div class="quote">
+                        "If Lex has 3x the length he's gonna 3x the view duration… Even if he is 20% worse on the click through rate, if he's 3x better on the duration, that's higher expected value for YouTube"
+                        <div class="quote-source"><a href="https://youtu.be/s0qovRw7-tA?t=1428" target="_blank">John, Media Empires, 09/23</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opera Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Opera</div>
+                        <div class="card-synthesis">Personal anecdote about attending opera in Silicon Valley. When friends' parents had tickets to Nixon in China, John was the only person who wanted to go and ended up sitting next to Jack Dorsey</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "When I first got to Silicon Valley, a friend's parents had tickets to <a href="https://x.com/johncoogan/status/1913709713109483595" target="_blank">Nixon in China</a> and I was the only person who wanted to go. Wound up sitting next to Jack Dorsey lol"
+                        <div class="quote-source"><a href="https://x.com/johncoogan/status/1913709713109483595" target="_blank">John April 19 2025</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banter Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Banter</div>
+                        <div class="card-synthesis">Humorous quote about how to get in touch with him - suggesting physical confrontation as the most effective communication method</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "If you want to get in touch with me, show up and grab me by the collar, shake me, until I hear what you have to say"
+                        <div class="quote-source"><a href="https://youtu.be/DZkDPtE4WmA?t=7432" target="_blank">John (Apr 23, 2025)</a></div>
+                    </div>
+                </div>
+            </div>
+
                 </div>
             </div>
         </div>
-   <!-- SLIDER DE ENTREVISTAS -->
-   <div class="interviews-slider-box">
-    <h3>🎙️ Interviews & Appearances</h3>
-    <div class="interview-slider-controls">
-        <button id="prevBtn" type="button">&lt;</button>
-        <span id="interviewCountDisplay">1 / 17</span>
-        <button id="nextBtn" type="button">&gt;</button>
-    </div>
-    <div id="interviewSlider" style="min-height:240px;">
-        <!-- Video dinámico aquí -->
-    </div>
-</div>
-</div>
-<script>
-// Lista fiel de entrevistas
-const interviews = [
-    { title: "Jul 24, 2024 | Sourcery with Molly O'Shea<br>John Coogan, EIR at Founders Fund, Founder of Soylent & Lucy", videoId: "KYkReFrm7Wg", link: "https://www.youtube.com/watch?v=KYkReFrm7Wg" },
-    { title: "Oct 25, 2024 | Pirate Wires<br>The Podcast Election, Why Markets Predict Trump Victory", videoId: "g8mKotuZXYk", link: "https://www.youtube.com/watch?v=g8mKotuZXYk" },
-    { title: "Nov 11, 2024 | The Startup Ideas Podcast<br>The craziest startup ideas I've heard", videoId: "ITifE1mLFmo", link: "https://www.youtube.com/watch?v=ITifE1mLFmo" },
-    { title: "Dec 18, 2024 | Austin Next Podcast<br>[Video Edition] Ep 119: What is the Gundo?", videoId: "nqjvbgrwbdw", link: "https://www.youtube.com/watch?v=nqjvbgrwbdw" },
-    { title: "Feb 7, 2025 | Pirate Wires<br>Trump & Elon Musk Expose The Deep State", videoId: "T99FwMatgrc", link: "https://www.youtube.com/watch?v=T99FwMatgrc" },
-    { title: "Mar 4, 2025 | Sphere Podcast<br>Ep 17 - John Coogan, Lucy/TBPN/Founders Fund", videoId: "Zi-W6YC2d5Q", link: "https://www.youtube.com/watch?v=Zi-W6YC2d5Q" },
-    { title: "May 9, 2025 | PF Jung<br>Millionaire Tech-Bro explains which ideologies dominate Silicon Valley", videoId: "1sSMoD3RmmY", link: "https://www.youtube.com/watch?v=1sSMoD3RmmY" },
-    { title: "Feb 2, 2018 | Software Engineering Daily<br>Soylent Engineering with John Coogan", videoId: "fpGf_n8gm4Q", link: "https://www.youtube.com/watch?v=fpGf_n8gm4Q" },
-    { title: "Jul 1, 2020 | The Shane White Show<br>SimpliFinance with Shane White Ep. #53", videoId: "G9etFvIvL8Q", link: "https://www.youtube.com/watch?v=G9etFvIvL8Q" },
-    { title: "Jul 11, 2021 | Mental Models Podcast<br>How to Make Good Decisions ft. @JohnCooganPlus", videoId: "-OhWogB3zBo", link: "https://www.youtube.com/watch?v=-OhWogB3zBo" },
-    { title: "Feb 10, 2023 | The Danny Miranda Podcast<br>John Coogan: Why Does The Media Hate Tech?", videoId: "5MyQPjzSvW4", link: "https://www.youtube.com/watch?v=5MyQPjzSvW4" },
-    { title: "Jun 27, 2023 | Terra API Podcast<br>The Soylent Co-Founder's Journey to Founders Fund", videoId: "CTFSSNtHqcs", link: "https://www.youtube.com/watch?v=CTFSSNtHqcs" },
-    { title: "Jul 19, 2023 | Hermeus Podcast<br>Defense Tech, Startups, and More with John Coogan", videoId: "AZPuGYX6eTA", link: "https://www.youtube.com/watch?v=AZPuGYX6eTA" },
-    { title: "Aug 10, 2023 | The Dock<br>John Coogan: The Marketing Genius That Cracked Startups AND YouTube", videoId: "wr6a5NF1mJ8", link: "https://www.youtube.com/watch?v=wr6a5NF1mJ8" },
-    { title: "Sep 13, 2023 | Media Empires<br>Monetization and Value on YouTube | John Coogan, Lucy", videoId: "s0qovRw7-tA", link: "https://www.youtube.com/watch?v=s0qovRw7-tA" },
-    { title: "Sep 19, 2023 | My First Million<br>Brainstorming +$1M Business Ideas With Soylent's Co-Founder", videoId: "vwum3O-sNKE", link: "https://www.youtube.com/watch?v=vwum3O-sNKE" },
-    { title: "Apr 17, 2025 | The Extended Mind Podcast<br>The Process of Knowledge and Innovation", videoId: "dIcfh1rDAsE", link: "https://www.youtube.com/watch?v=dIcfh1rDAsE" }
-];
-let currentInterviewIndex = 0;
-function renderInterviewItem(item) {
-    return `<div class="interview-item">
-        <div class="interview-title">${item.title}</div>
-        <div class="interview-video" style="width:100%;max-width:420px;">
-            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;width:100%;">
-                <iframe src="https://www.youtube.com/embed/${item.videoId}"
-                        style="position:absolute;top:0;left:0;width:100%;height:100%;"
-                        frameborder="0"
-                        allow="autoplay; encrypted-media"
-                        allowfullscreen
-                        title="YouTube video"></iframe>
+
+        <!-- NARRATIVE CARDS (without section header) -->
+        <div class="entity-cards-wrapper">
+            
+            <!-- Investment Activity Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Investment Activity</div>
+                        <div class="card-synthesis">John has made investments in startups that discovered him through his YouTube channel, demonstrating the channel's effectiveness as a deal flow generator and networking tool</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <p>He's also said that he's <a href="https://youtu.be/5MyQPjzSvW4?t=2032" target="_blank">made</a> investments in startups that have met him through the YouTube channel.</p>
+                </div>
+            </div>
+
+            <!-- Background Card -->
+            <div class="expandable-card">
+                <div class="card-header" onclick="event.stopPropagation(); toggleCard(this)">
+                    <div class="card-title-wrapper">
+                        <div class="card-title">Educational Background</div>
+                        <div class="card-synthesis">John worked several full-time internships during college but chose not to accept traditional job offers after graduation, instead pursuing entrepreneurial ventures</div>
+                    </div>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="quote">
+                        "I worked several full time jobs in college [internships], but didn't accept a job offer after graduation"
+                        <div class="quote-source"><a href="https://x.com/johncoogan/status/1896813459255542034" target="_blank">John</a></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Interviews Slider -->
+        <div class="interviews-slider-box">
+            <h3>📺 Interviews & Podcast Appearances</h3>
+            <div class="interview-slider">
+                
+                <div class="interview-item">
+                    <div class="interview-title">Soylent Engineering with John Coogan</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/fpGf_n8gm4Q" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>Software Engineering Daily</span>
+                        <span>Feb 2, 2018</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">SimpliFinance with Shane White - John Coogan (Co-Founder of Soylent & Lucy.co)</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/G9etFvIvL8Q?start=2987" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>The Shane White Show</span>
+                        <span>Jul 1, 2020</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">How to Make Good Decisions (according to science) ft. @JohnCooganPlus</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/-OhWogB3zBo?start=802" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>Mental Models Podcast</span>
+                        <span>Jul 11, 2021</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">John Coogan: Why Does The Media Hate Tech?</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/5MyQPjzSvW4" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>The Danny Miranda Podcast</span>
+                        <span>Feb 10, 2023</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">The Soylent Co-Founder's Journey to Founders Fund</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/CTFSSNtHqcs?start=2008" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>Terra API Podcast</span>
+                        <span>Jun 27, 2023</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">Defense Tech, Startups, and More with John Coogan</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/AZPuGYX6eTA?start=542" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>The Hermeus Podcast</span>
+                        <span>Jul 19, 2023</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">John Coogan: The Marketing Genius That Cracked Startups AND YouTube</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/wr6a5NF1mJ8" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>The Dock</span>
+                        <span>Aug 10, 2023</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">Monetization and Value on YouTube | John Coogan, Lucy</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/s0qovRw7-tA" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>Media Empires</span>
+                        <span>Sep 13, 2023</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">Brainstorming +$1M Business Ideas With Soylent's Co-Founder</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/vwum3O-sNKE" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>MFM</span>
+                        <span>Sep 19, 2023</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">John Coogan, EIR at Founders Fund, Founder of Soylent & Lucy</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/KYkReFrm7Wg" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>Sourcery with Molly O'Shea</span>
+                        <span>Jul 24, 2024</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">The Podcast Election, Why Markets Predict Trump Victory</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/g8mKotuZXYk?start=14" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>Pirate Wires</span>
+                        <span>Oct 25, 2024</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">The craziest startup ideas I've heard</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/ITifE1mLFmo" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>The Startup Ideas Podcast</span>
+                        <span>Nov 11, 2024</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">[Video Edition] Ep 119: What is the Gundo?</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/nqjvbgrwbdw?start=45" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>Austin Next Podcast</span>
+                        <span>Dec 18, 2024</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">Trump & Elon Musk Expose The Deep State</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/T99FwMatgrc" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>Pirate Wires</span>
+                        <span>Feb 7, 2025</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">The Insane State of Nicotine Regulation in the US</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/Zi-W6YC2d5Q?start=107" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>Sphere Podcast</span>
+                        <span>Mar 4, 2025</span>
+                    </div>
+                </div>
+
+                <div class="interview-item">
+                    <div class="interview-title">Millionaire Tech-Bro explains which ideologies dominate Silicon Valley</div>
+                    <div class="interview-video">
+                        <iframe src="https://www.youtube.com/embed/1sSMoD3RmmY?start=2124" allowfullscreen></iframe>
+                    </div>
+                    <div class="interview-meta">
+                        <span>PF Jung</span>
+                        <span>May 9, 2025</span>
+                    </div>
+                </div>
+
             </div>
         </div>
-        <div class="interview-meta"><a href="${item.link}" target="_blank">Watch on YouTube</a></div>
-    </div>`;
-}
-function updateInterviewSlider() {
-    document.getElementById('interviewSlider').innerHTML = renderInterviewItem(interviews[currentInterviewIndex]);
-    document.getElementById('interviewCountDisplay').textContent = `${currentInterviewIndex + 1} / ${interviews.length}`;
-}
-function prevInterview() {
-    currentInterviewIndex = (currentInterviewIndex - 1 + interviews.length) % interviews.length;
-    updateInterviewSlider();
-}
-function nextInterview() {
-    currentInterviewIndex = (currentInterviewIndex + 1) % interviews.length;
-    updateInterviewSlider();
-}
-document.addEventListener('DOMContentLoaded', function() {
-    // Expand/collapse logic
-    document.querySelectorAll('.card-header').forEach(header => {
-        header.addEventListener('click', function(e) {
-            const card = header.parentElement;
+
+    </div>
+
+    <script>
+        function toggleCard(header) {
+            const card = header.closest('.expandable-card');
             card.classList.toggle('open');
+        }
+
+        function toggleIdeasSection() {
+            const section = document.querySelector('.ideas-section');
+            section.classList.toggle('collapsed');
+        }
+
+        // Auto-scroll functionality for interview slider
+        document.addEventListener('DOMContentLoaded', function() {
+            const slider = document.querySelector('.interview-slider');
+            let isScrolling = false;
+
+            slider.addEventListener('wheel', function(e) {
+                if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                    e.preventDefault();
+                    slider.scrollLeft += e.deltaY;
+                }
+            });
         });
-    });
-    // Slider de entrevistas
-    updateInterviewSlider();
-    document.getElementById('prevBtn').onclick = prevInterview;
-    document.getElementById('nextBtn').onclick = nextInterview;
-});
-</script>
+    </script>
 </body>
 </html>
