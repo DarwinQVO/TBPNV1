@@ -226,70 +226,82 @@
                 </div>
             </div>
         </div>
-        <!-- Entrevistas/Interviews SLIDER (solo 1 visible con controles) -->
-        <div class="interviews-slider-box">
-            <h3>🎙️ Interviews & Appearances</h3>
-            <div class="interview-slider-controls">
-                <button onclick="prevInterview()">&lt;</button>
-                <span id="interviewCountDisplay">1 / 17</span>
-                <button onclick="nextInterview()">&gt;</button>
-            </div>
-            <div id="interviewSlider"></div>
-        </div>
+   <!-- SLIDER DE ENTREVISTAS -->
+   <div class="interviews-slider-box">
+    <h3>🎙️ Interviews & Appearances</h3>
+    <div class="interview-slider-controls">
+        <button id="prevBtn" type="button">&lt;</button>
+        <span id="interviewCountDisplay">1 / 17</span>
+        <button id="nextBtn" type="button">&gt;</button>
     </div>
-    <script>
-    // 17 entrevistas, info real:
-    const interviews = [
-        { title: "Jul 24, 2024 | Sourcery with Molly O'Shea<br>John Coogan, EIR at Founders Fund, Founder of Soylent & Lucy", videoId: "KYkReFrm7Wg", link: "https://www.youtube.com/watch?v=KYkReFrm7Wg" },
-        { title: "Oct 25, 2024 | Pirate Wires<br>The Podcast Election, Why Markets Predict Trump Victory", videoId: "g8mKotuZXYk", link: "https://www.youtube.com/watch?v=g8mKotuZXYk" },
-        { title: "Nov 11, 2024 | The Startup Ideas Podcast<br>The craziest startup ideas I've heard", videoId: "ITifE1mLFmo", link: "https://www.youtube.com/watch?v=ITifE1mLFmo" },
-        { title: "Dec 18, 2024 | Austin Next Podcast<br>[Video Edition] Ep 119: What is the Gundo?", videoId: "nqjvbgrwbdw", link: "https://www.youtube.com/watch?v=nqjvbgrwbdw" },
-        { title: "Feb 7, 2025 | Pirate Wires<br>Trump & Elon Musk Expose The Deep State", videoId: "T99FwMatgrc", link: "https://www.youtube.com/watch?v=T99FwMatgrc" },
-        { title: "Mar 4, 2025 | Sphere Podcast<br>Ep 17 - John Coogan, Lucy/TBPN/Founders Fund", videoId: "Zi-W6YC2d5Q", link: "https://www.youtube.com/watch?v=Zi-W6YC2d5Q" },
-        { title: "May 9, 2025 | PF Jung<br>Millionaire Tech-Bro explains which ideologies dominate Silicon Valley", videoId: "1sSMoD3RmmY", link: "https://www.youtube.com/watch?v=1sSMoD3RmmY" },
-        { title: "Feb 2, 2018 | Software Engineering Daily<br>Soylent Engineering with John Coogan", videoId: "fpGf_n8gm4Q", link: "https://www.youtube.com/watch?v=fpGf_n8gm4Q" },
-        { title: "Jul 1, 2020 | The Shane White Show<br>SimpliFinance with Shane White Ep. #53", videoId: "G9etFvIvL8Q", link: "https://www.youtube.com/watch?v=G9etFvIvL8Q" },
-        { title: "Jul 11, 2021 | Mental Models Podcast<br>How to Make Good Decisions ft. @JohnCooganPlus", videoId: "-OhWogB3zBo", link: "https://www.youtube.com/watch?v=-OhWogB3zBo" },
-        { title: "Feb 10, 2023 | The Danny Miranda Podcast<br>John Coogan: Why Does The Media Hate Tech?", videoId: "5MyQPjzSvW4", link: "https://www.youtube.com/watch?v=5MyQPjzSvW4" },
-        { title: "Jun 27, 2023 | Terra API Podcast<br>The Soylent Co-Founder's Journey to Founders Fund", videoId: "CTFSSNtHqcs", link: "https://www.youtube.com/watch?v=CTFSSNtHqcs" },
-        { title: "Jul 19, 2023 | Hermeus Podcast<br>Defense Tech, Startups, and More with John Coogan", videoId: "AZPuGYX6eTA", link: "https://www.youtube.com/watch?v=AZPuGYX6eTA" },
-        { title: "Aug 10, 2023 | The Dock<br>John Coogan: The Marketing Genius That Cracked Startups AND YouTube", videoId: "wr6a5NF1mJ8", link: "https://www.youtube.com/watch?v=wr6a5NF1mJ8" },
-        { title: "Sep 13, 2023 | Media Empires<br>Monetization and Value on YouTube | John Coogan, Lucy", videoId: "s0qovRw7-tA", link: "https://www.youtube.com/watch?v=s0qovRw7-tA" },
-        { title: "Sep 19, 2023 | My First Million<br>Brainstorming +$1M Business Ideas With Soylent's Co-Founder", videoId: "vwum3O-sNKE", link: "https://www.youtube.com/watch?v=vwum3O-sNKE" },
-        { title: "Apr 17, 2025 | The Extended Mind Podcast<br>The Process of Knowledge and Innovation", videoId: "dIcfh1rDAsE", link: "https://www.youtube.com/watch?v=dIcfh1rDAsE" }
-    ];
-    let currentInterviewIndex = 0;
-    function renderInterviewItem(item) {
-        return `<div class="interview-item">
-            <div class="interview-title">${item.title}</div>
-            <div class="interview-video"><iframe width="360" height="202" src="https://www.youtube.com/embed/${item.videoId}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>
-            <div class="interview-meta"><a href="${item.link}" target="_blank">Watch on YouTube</a></div>
-        </div>`;
-    }
-    function updateInterviewSlider() {
-        document.getElementById('interviewSlider').innerHTML = renderInterviewItem(interviews[currentInterviewIndex]);
-        document.getElementById('interviewCountDisplay').textContent = `${currentInterviewIndex + 1} / ${interviews.length}`;
-    }
-    function prevInterview() {
-        currentInterviewIndex = (currentInterviewIndex - 1 + interviews.length) % interviews.length;
-        updateInterviewSlider();
-    }
-    function nextInterview() {
-        currentInterviewIndex = (currentInterviewIndex + 1) % interviews.length;
-        updateInterviewSlider();
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        // Expand/collapse logic for all cards
-        document.querySelectorAll('.card-header').forEach(header => {
-            header.addEventListener('click', function(e) {
-                if (e.target.classList.contains('card-toggle') || e.target.classList.contains('card-header') || e.target.parentElement.classList.contains('card-header')) {
-                    const card = header.parentElement;
-                    card.classList.toggle('open');
-                }
-            });
+    <div id="interviewSlider" style="min-height:240px;">
+        <!-- Video dinámico aquí -->
+    </div>
+</div>
+</div>
+<script>
+// Lista fiel de entrevistas
+const interviews = [
+    { title: "Jul 24, 2024 | Sourcery with Molly O'Shea<br>John Coogan, EIR at Founders Fund, Founder of Soylent & Lucy", videoId: "KYkReFrm7Wg", link: "https://www.youtube.com/watch?v=KYkReFrm7Wg" },
+    { title: "Oct 25, 2024 | Pirate Wires<br>The Podcast Election, Why Markets Predict Trump Victory", videoId: "g8mKotuZXYk", link: "https://www.youtube.com/watch?v=g8mKotuZXYk" },
+    { title: "Nov 11, 2024 | The Startup Ideas Podcast<br>The craziest startup ideas I've heard", videoId: "ITifE1mLFmo", link: "https://www.youtube.com/watch?v=ITifE1mLFmo" },
+    { title: "Dec 18, 2024 | Austin Next Podcast<br>[Video Edition] Ep 119: What is the Gundo?", videoId: "nqjvbgrwbdw", link: "https://www.youtube.com/watch?v=nqjvbgrwbdw" },
+    { title: "Feb 7, 2025 | Pirate Wires<br>Trump & Elon Musk Expose The Deep State", videoId: "T99FwMatgrc", link: "https://www.youtube.com/watch?v=T99FwMatgrc" },
+    { title: "Mar 4, 2025 | Sphere Podcast<br>Ep 17 - John Coogan, Lucy/TBPN/Founders Fund", videoId: "Zi-W6YC2d5Q", link: "https://www.youtube.com/watch?v=Zi-W6YC2d5Q" },
+    { title: "May 9, 2025 | PF Jung<br>Millionaire Tech-Bro explains which ideologies dominate Silicon Valley", videoId: "1sSMoD3RmmY", link: "https://www.youtube.com/watch?v=1sSMoD3RmmY" },
+    { title: "Feb 2, 2018 | Software Engineering Daily<br>Soylent Engineering with John Coogan", videoId: "fpGf_n8gm4Q", link: "https://www.youtube.com/watch?v=fpGf_n8gm4Q" },
+    { title: "Jul 1, 2020 | The Shane White Show<br>SimpliFinance with Shane White Ep. #53", videoId: "G9etFvIvL8Q", link: "https://www.youtube.com/watch?v=G9etFvIvL8Q" },
+    { title: "Jul 11, 2021 | Mental Models Podcast<br>How to Make Good Decisions ft. @JohnCooganPlus", videoId: "-OhWogB3zBo", link: "https://www.youtube.com/watch?v=-OhWogB3zBo" },
+    { title: "Feb 10, 2023 | The Danny Miranda Podcast<br>John Coogan: Why Does The Media Hate Tech?", videoId: "5MyQPjzSvW4", link: "https://www.youtube.com/watch?v=5MyQPjzSvW4" },
+    { title: "Jun 27, 2023 | Terra API Podcast<br>The Soylent Co-Founder's Journey to Founders Fund", videoId: "CTFSSNtHqcs", link: "https://www.youtube.com/watch?v=CTFSSNtHqcs" },
+    { title: "Jul 19, 2023 | Hermeus Podcast<br>Defense Tech, Startups, and More with John Coogan", videoId: "AZPuGYX6eTA", link: "https://www.youtube.com/watch?v=AZPuGYX6eTA" },
+    { title: "Aug 10, 2023 | The Dock<br>John Coogan: The Marketing Genius That Cracked Startups AND YouTube", videoId: "wr6a5NF1mJ8", link: "https://www.youtube.com/watch?v=wr6a5NF1mJ8" },
+    { title: "Sep 13, 2023 | Media Empires<br>Monetization and Value on YouTube | John Coogan, Lucy", videoId: "s0qovRw7-tA", link: "https://www.youtube.com/watch?v=s0qovRw7-tA" },
+    { title: "Sep 19, 2023 | My First Million<br>Brainstorming +$1M Business Ideas With Soylent's Co-Founder", videoId: "vwum3O-sNKE", link: "https://www.youtube.com/watch?v=vwum3O-sNKE" },
+    { title: "Apr 17, 2025 | The Extended Mind Podcast<br>The Process of Knowledge and Innovation", videoId: "dIcfh1rDAsE", link: "https://www.youtube.com/watch?v=dIcfh1rDAsE" }
+];
+let currentInterviewIndex = 0;
+function renderInterviewItem(item) {
+    return `<div class="interview-item">
+        <div class="interview-title">${item.title}</div>
+        <div class="interview-video" style="width:100%;max-width:420px;">
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;width:100%;">
+                <iframe src="https://www.youtube.com/embed/${item.videoId}"
+                        style="position:absolute;top:0;left:0;width:100%;height:100%;"
+                        frameborder="0"
+                        allow="autoplay; encrypted-media"
+                        allowfullscreen
+                        title="YouTube video"></iframe>
+            </div>
+        </div>
+        <div class="interview-meta"><a href="${item.link}" target="_blank">Watch on YouTube</a></div>
+    </div>`;
+}
+function updateInterviewSlider() {
+    document.getElementById('interviewSlider').innerHTML = renderInterviewItem(interviews[currentInterviewIndex]);
+    document.getElementById('interviewCountDisplay').textContent = `${currentInterviewIndex + 1} / ${interviews.length}`;
+}
+function prevInterview() {
+    currentInterviewIndex = (currentInterviewIndex - 1 + interviews.length) % interviews.length;
+    updateInterviewSlider();
+}
+function nextInterview() {
+    currentInterviewIndex = (currentInterviewIndex + 1) % interviews.length;
+    updateInterviewSlider();
+}
+document.addEventListener('DOMContentLoaded', function() {
+    // Expand/collapse logic
+    document.querySelectorAll('.card-header').forEach(header => {
+        header.addEventListener('click', function(e) {
+            const card = header.parentElement;
+            card.classList.toggle('open');
         });
-        updateInterviewSlider();
     });
-    </script>
+    // Slider de entrevistas
+    updateInterviewSlider();
+    document.getElementById('prevBtn').onclick = prevInterview;
+    document.getElementById('nextBtn').onclick = nextInterview;
+});
+</script>
 </body>
 </html>
