@@ -324,6 +324,24 @@
         function loadEntityHtml(entityId) {
             const center = document.getElementById('centerInfoColumn');
             if (!entityId) return;
+            
+            // Special case for TBPN
+            if (entityId === 'tbpn') {
+                fetch('tbpn.html')
+                    .then(resp => resp.text())
+                    .then(html => {
+                        center.innerHTML = html;
+                        // Initialize Jordi page if function exists
+                        if (window.initializeJordiPage) {
+                            setTimeout(() => window.initializeJordiPage(), 100);
+                        }
+                    })
+                    .catch(err => {
+                        center.innerHTML = `<div class="empty-entity"><span class="icon">📄</span>1.</div>`;
+                    });
+                return;
+            }
+
             const filename = entityId + ".html";
             center.innerHTML = '<div class="loading">Cargando…</div>';
             fetch(filename)
@@ -331,8 +349,17 @@
                     if (!resp.ok) throw new Error('No encontrado');
                     return resp.text();
                 })
-                .then(html => { center.innerHTML = html; })
-                .catch(err => { center.innerHTML = `<div class="empty-entity"><span class="icon">📄</span>No hay documento para esta entidad.</div>`; });
+                .then(html => { 
+                    center.innerHTML = html; 
+                    
+                    // Initialize Jordi page if function exists
+                    if (entityId === 'tbpn' && window.initializeJordiPage) {
+                        setTimeout(() => window.initializeJordiPage(), 100);
+                    }
+                })
+                .catch(err => { 
+                    center.innerHTML = `<div class="empty-entity"><span class="icon">📄</span>No hay documento para esta entidad.</div>`; 
+                });
         }
 
         function renderEntity(entityId) {
@@ -478,37 +505,94 @@
                 }
             }
         }
-        // === Cards expandibles para el centro (contenido de cada entidad) ===
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('card-header') || e.target.closest('.card-header')) {
-                const header = e.target.closest('.card-header');
-                const card = header.parentElement;
-                card.classList.toggle('open');
+// === Funciones globales para el contenido de entidades ===
+function toggleIdeasSection() {
+    const section = document.querySelector('.ideas-section');
+    if (section) {
+        section.classList.toggle('collapsed');
+    }
+}
+
+function toggleCard(header) {
+    const card = header.closest('.expandable-card');
+    if (card) {
+        card.classList.toggle('open');
+    }
+}
+
+// === Event listener para cards expandibles ===
+document.addEventListener('click', function(e) {
+    // Manejar clics en card-header de expandable-card, pero NO en section-header-main
+    if (e.target.closest('.card-header') && 
+        e.target.closest('.expandable-card') &&
+        !e.target.closest('.section-header-main')) {
+        
+        const header = e.target.closest('.card-header');
+        const card = header.closest('.expandable-card');
+        if (card) {
+            card.classList.toggle('open');
+        }
+    }
+});
+// === Inicialización principal ===
+document.addEventListener('DOMContentLoaded', function() {
+    // Renderizar entidad inicial
+    renderEntity(currentEntityId);
+    loadEntityHtml(currentEntityId);
+    
+    // Configurar navegación
+    const navLinks = document.querySelectorAll('.left-nav-column .nav-item a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const previouslyActive = document.querySelector('.left-nav-column .nav-item a.active');
+            if (previouslyActive) previouslyActive.classList.remove('active');
+            this.classList.add('active');
+            const entityId = this.getAttribute('data-entity');
+            isDetailsPanelExpandedGlobally = false;
+            isMinimalModeActive = true; 
+            renderEntity(entityId);
+            loadEntityHtml(entityId);
+        });
+    });
+    
+    // Aplicar modo inicial
+    setTimeout(() => {
+        applyMinimalModeToSections(true);
+        updateMinimalModeButton();
+    }, 100);
+    
+    // Función para configurar el slider cuando se carga contenido
+    function setupInterviewSlider() {
+        const slider = document.querySelector('.interview-slider');
+        if (slider) {
+            slider.addEventListener('wheel', function(e) {
+                if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                    e.preventDefault();
+                    slider.scrollLeft += e.deltaY;
+                }
+            });
+        }
+    }
+    
+    // Configurar slider inicialmente
+    setupInterviewSlider();
+    
+    // Observar cambios en el DOM para reconfigurar cuando se cargue nuevo contenido
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList') {
+                setupInterviewSlider();
             }
         });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            renderEntity(currentEntityId);
-            loadEntityHtml(currentEntityId);
-            const navLinks = document.querySelectorAll('.left-nav-column .nav-item a');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const previouslyActive = document.querySelector('.left-nav-column .nav-item a.active');
-                    if (previouslyActive) previouslyActive.classList.remove('active');
-                    this.classList.add('active');
-                    const entityId = this.getAttribute('data-entity');
-                    isDetailsPanelExpandedGlobally = false;
-                    isMinimalModeActive = true; 
-                    renderEntity(entityId);
-                    loadEntityHtml(entityId);
-                });
-            });
-            setTimeout(() => {
-                 applyMinimalModeToSections(true);
-                 updateMinimalModeButton();
-            }, 100);
-        });
+    });
+    
+    // Observar cambios en el contenedor central
+    const centerColumn = document.getElementById('centerInfoColumn');
+    if (centerColumn) {
+        observer.observe(centerColumn, { childList: true, subtree: true });
+    }
+});
     </script>
 </body>
 </html>
